@@ -6,7 +6,6 @@
 #include "BattleSystem.h"
 #include "Pokimon.h"
 
-int x, y; //プレイヤー座標
 char map[25][101];
 FILE *map1;
 
@@ -18,18 +17,18 @@ int MapFadeOut(void);
 int main(void){
 
   int i, j, chr, result = 0; //システムに関する変数
-  char before[1] = {' '};
+  char before[1] = {' '}, file_name[20];
 
-  if((map1 = fopen("Maps/Map1.txt", "r")) == NULL){
+  LoadPlayerData(0);
+
+  sprintf(file_name, "Maps/%s.txt", GetPlayerInMap());
+
+  if((map1 = fopen(file_name, "r")) == NULL){
 
     printf("【エラー: マップファイルが読み込めませんでした。】");
     return -1;
 
   }
-
-  LoadPlayerData(0);
-  x = GetPlayerX();
-  y = GetPlayerY();
 
   for(i = 0; i < 25; i ++)
     fgets(map[i], 102, map1);
@@ -47,7 +46,7 @@ int main(void){
 
       for(j = 0; j < 100; j ++){
 
-        if(i == y && j == x){
+        if(i == GetPlayerY() && j == GetPlayerX()){
 
           before[0] = map[i][j];
           map[i][j] = 'O';
@@ -130,12 +129,12 @@ int Key(void){
 
 int PlayerMove(int changeX, int changeY){
 
-  switch(map[y + changeY][x + changeX]){
+  switch(map[GetPlayerY() + changeY][GetPlayerX() + changeX]){
 
     case '=':
     case '|':
 
-      return 1;
+      return -1;
 
     case 'w':
 
@@ -151,13 +150,30 @@ int PlayerMove(int changeX, int changeY){
 
       break;
 
+    case 'P':
+
+      MapFadeOut();
+      MapFadeIn("pokisen");
+      SetPlayerInMap("pokisen");
+      SetPlayerX(48);
+      SetPlayerY(14);
+
+      return 0;
+
+    case 'E':
+
+      MapFadeOut();
+      MapFadeIn("map1");
+      SetPlayerInMap("map1");
+      SetPlayerX(63);
+      SetPlayerY(10);
+
+      return 0;
+
   }
 
-  x += changeX;
-  y += changeY;
-
-  SetPlayerX(x);
-  SetPlayerY(y);
+  SetPlayerX(GetPlayerX() + changeX);
+  SetPlayerY(GetPlayerY() + changeY);
 
   return 0;
 
@@ -206,7 +222,7 @@ int MapFadeOut(void){
 
     system("cls");
 
-    for(j = 0; j < 101; j++){
+    for(j = 0; j < 99; j++){
 
       map[i][j] = ' ';
       map[24 - i][j] = ' ';
@@ -214,7 +230,7 @@ int MapFadeOut(void){
     }
 
     for(j = 0; j < 25; j++)
-      printf("%s", display[j]);
+      printf("%s", map[j]);
 
     Sleep(10);
 

@@ -8,7 +8,7 @@
 |         wwwww||wwwwwwwwwwwww||||                                                            |===|
 |   wwwwwwwwww||wwwwwwwwwwwww||||                                                              |==|
 |wwwwwwwwwwwww||wwwwwwwwwwww||||                                                                |=|
-|wwwwwwwwwww|||     wwwwwww||||                            •¶                                     |
+|wwwwwwwwwww|||     wwwwwww||||                            P                                      |
 |wwwwwwwwww||||       wwww||||              ||==========================|                         |
 |wwwwwwwwww||||         ww||||             ||============================|                        |
 |wwwwwwwwww||||           ||||            |||=============================|                       |

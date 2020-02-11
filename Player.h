@@ -28,7 +28,7 @@ static struct players{
 /* プロトタイプ宣言 */
 int CreatePlayerData(char*);
 int GetPlayerId(void);
-char GetPlayerName(void);
+char *GetPlayerName(void);
 int GetPlayerX(void);
 int GetPlayerY(void);
 char *GetPlayerInMap(void);
@@ -114,12 +114,12 @@ int GetPlayerId(void){
 
 }
 
-char GetPlayerName(void){
+char *GetPlayerName(void){
 
   if(IsLoaded)
-    return *player.name;
+    return player.name;
 
-  return FAILED;
+  return "FAILED";
 
 }
 
@@ -146,7 +146,7 @@ char *GetPlayerInMap(void){
   if(IsLoaded)
     return player.map;
 
-  return "-1";
+  return "FAILED";
 
 }
 

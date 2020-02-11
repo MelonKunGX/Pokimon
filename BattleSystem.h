@@ -26,7 +26,7 @@ int Encount(void){
   srand((unsigned) time(NULL));
   // 確率 = 0~99の乱数生成 ÷ (基準歩数 + エンカウントレベル)
   prob = (rand() % 100) / STEPS;
-  prob = 0;
+  prob = 1;
 
   if(prob == 0){
 

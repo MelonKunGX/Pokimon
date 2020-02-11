@@ -60,7 +60,7 @@ int SetPokimonSp(int, int);
 int CreatePlayerData(char *name){
 
   int result, i = 0;
-  char find_name[20];
+  char find_name[20], dummy[1];
   FILE *fp;
 
   if((fp = fopen("Data/players.txt", "r")) == NULL)
@@ -70,15 +70,16 @@ int CreatePlayerData(char *name){
 
     fseek(fp, i * 320L, SEEK_SET);
 
-    if(fscanf(fp, "%*5d%20s", find_name) == EOF)
+    if(fscanf(fp, "%*5d%20s%*331c", find_name) == EOF)
 			break;
 
     if(strcmp(name, find_name) == 0)
     	return FAILED;
 
-    i++;
-
   }
+
+  while(fgets(dummy, 1, fp) != NULL)
+    i++;
 
   fclose(fp);
 
@@ -286,7 +287,6 @@ int PrintPlayerData(void){
 
 int SavePlayerData(void){
 
-  int i;
   FILE *fp;
 
   if(!IsLoaded)
@@ -296,25 +296,16 @@ int SavePlayerData(void){
     return FAILED;
 
   fseek(fp, player.id * 320L, SEEK_SET);
-  fprintf(fp, "%5d%20s%5d%5d%20s", player.id, player.name, player.x, player.y, player.map);
 
-  for(i = 0; i < 6; i++){
-
-  	fprintf(fp, "%5d%20s%5d%5d%5d%5d%5d",
-      player.pokimon[i].id,
-      player.pokimon[i].name,
-      player.pokimon[i].atk,
-      player.pokimon[i].def,
-      player.pokimon[i].max_hp,
-      player.pokimon[i].hp,
-      player.pokimon[i].sp
-    );
-
-    if(i == 5)
-    	fprintf(fp, "\n");
-
-  }
-
+  fprintf(fp, "%5d%20s%5d%5d%20s%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d",
+    player.id, player.name, player.x, player.y, player.map,
+    player.pokimon[0].id, player.pokimon[0].name, player.pokimon[0].atk, player.pokimon[0].def, player.pokimon[0].max_hp, player.pokimon[0].hp, player.pokimon[0].sp,
+    player.pokimon[1].id, player.pokimon[1].name, player.pokimon[1].atk, player.pokimon[1].def, player.pokimon[1].max_hp, player.pokimon[1].hp, player.pokimon[1].sp,
+    player.pokimon[2].id, player.pokimon[2].name, player.pokimon[2].atk, player.pokimon[2].def, player.pokimon[2].max_hp, player.pokimon[2].hp, player.pokimon[2].sp,
+    player.pokimon[3].id, player.pokimon[3].name, player.pokimon[3].atk, player.pokimon[3].def, player.pokimon[3].max_hp, player.pokimon[3].hp, player.pokimon[3].sp,
+    player.pokimon[0].id, player.pokimon[4].name, player.pokimon[4].atk, player.pokimon[4].def, player.pokimon[4].max_hp, player.pokimon[4].hp, player.pokimon[4].sp,
+    player.pokimon[0].id, player.pokimon[5].name, player.pokimon[5].atk, player.pokimon[5].def, player.pokimon[5].max_hp, player.pokimon[5].hp, player.pokimon[5].sp
+  );
   fclose(fp);
   return SUCCESS;
 

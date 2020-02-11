@@ -7,7 +7,7 @@
 #include "Pokimon.h"
 
 char map[25][101];
-FILE *map1;
+FILE *fp;
 
 int Key(void);
 int PlayerMove(int, int);
@@ -23,7 +23,7 @@ int main(void){
 
   sprintf(file_name, "Maps/%s.txt", GetPlayerInMap());
 
-  if((map1 = fopen(file_name, "r")) == NULL){
+  if((fp = fopen(file_name, "r")) == NULL){
 
     printf("【エラー: マップファイルが読み込めませんでした。】");
     return -1;
@@ -31,7 +31,7 @@ int main(void){
   }
 
   for(i = 0; i < 25; i ++)
-    fgets(map[i], 102, map1);
+    fgets(map[i], 102, fp);
 
   while(result != 1){
 
@@ -58,7 +58,17 @@ int main(void){
     for(i = 0; i < 25; i ++)
       printf("%s", map[i]);
 
-    printf("\n\n\n\t\t\t\tO:プレイヤー w:草むら 文：ポキセン ESC:終了\n");
+    if(strcmp(GetPlayerInMap(), "pokisen") == 0){
+
+      printf("\n\n\t\t\t\t【操作】↑→↓←:移動 ESC:メニュー");
+      printf("\n\t\t【マップの記号】O:プレイヤー C:カウンター E:出口 ESC:メニュー");
+
+    }else{
+
+      printf("\n\n\t\t\t【操作】↑→↓←:移動 ESC:メニュー");
+      printf("\n   【マップの記号】O:プレイヤー w:草むら P：ポキセン <:前のマップへ >:次のマップへ ESC:メニュー\n");
+
+    }
 
     do{
 
@@ -67,8 +77,9 @@ int main(void){
     }while(result == 2);
   }
 
-  fclose(map1);
+  fclose(fp);
   SavePlayerData();
+  system("cls");
 
   return 0;
 
@@ -116,11 +127,11 @@ int Key(void){
 
     default:
 
-      result = 1;
+      return 2;
 
   }
 
-  if(result == 1)
+  if(result == -1)
     return 2;
 
   return 0;
@@ -129,6 +140,9 @@ int Key(void){
 
 int PlayerMove(int changeX, int changeY){
 
+  int i, in, mode;
+  static char before_map[20];
+
   switch(map[GetPlayerY() + changeY][GetPlayerX() + changeX]){
 
     case '=':
@@ -136,13 +150,63 @@ int PlayerMove(int changeX, int changeY){
 
       return -1;
 
+    case '>':
+
+      MapFadeOut();
+
+      if(strcmp(GetPlayerInMap(), "map1") == 0){
+
+        MapFadeIn("map2");
+        SetPlayerInMap("map2");
+        SetPlayerX(5);
+        SetPlayerY(2);
+        return 0;
+
+      }
+
+      if(strcmp(GetPlayerInMap(), "map2") == 0){
+
+        MapFadeIn("map3");
+        SetPlayerInMap("map3");
+        SetPlayerX(5);
+        SetPlayerY(23);
+        return 0;
+
+      }
+
+    case '<':
+
+      MapFadeOut();
+
+      if(strcmp(GetPlayerInMap(), "map2") == 0){
+
+        MapFadeIn("map1");
+        SetPlayerInMap("map1");
+        SetPlayerX(95);
+        SetPlayerY(23);
+        return 0;
+
+      }
+
+      if(strcmp(GetPlayerInMap(), "map3") == 0){
+
+        MapFadeIn("map2");
+        SetPlayerInMap("map2");
+        SetPlayerX(95);
+        SetPlayerY(22);
+        return 0;
+
+      }
+
     case 'w':
 
       if(Encount() == 1){
 
         BattleFadeOut(0);
         BattleFadeIn();
-        BattleTop();
+        printf("%d\n", RandomPokimon());
+        getch();
+        BattleTop(RandomPokimon());
         BattleFadeOut(1);
         MapFadeIn(GetPlayerInMap());
 
@@ -152,6 +216,7 @@ int PlayerMove(int changeX, int changeY){
 
     case 'P':
 
+      strcpy(before_map, GetPlayerInMap());
       MapFadeOut();
       MapFadeIn("pokisen");
       SetPlayerInMap("pokisen");
@@ -163,13 +228,89 @@ int PlayerMove(int changeX, int changeY){
     case 'E':
 
       MapFadeOut();
-      MapFadeIn("map1");
-      SetPlayerInMap("map1");
-      SetPlayerX(63);
-      SetPlayerY(10);
+      MapFadeIn(before_map);
+      SetPlayerInMap(before_map);
+
+      if(strcmp(GetPlayerInMap(), "map1") == 0){
+
+        SetPlayerX(63);
+        SetPlayerY(10);
+
+      }
+
+      if(strcmp(GetPlayerInMap(), "map2") == 0){
+
+        SetPlayerX(80);
+        SetPlayerY(5);
+
+      }
+
+      if(strcmp(GetPlayerInMap(), "map3") == 0){
+
+        SetPlayerX(57);
+        SetPlayerY(9);
+
+      }
 
       return 0;
 
+    case 'C':
+
+      mode = 0;
+
+      while(1){
+
+        system("cls");
+
+        for(i = 0; i < 25; i++)
+          printf("%s", map[i]);
+
+        printf("\n\n\t\t\t\t手持ちのポキモンを回復させますか？\n");
+
+        if(mode == 0)
+          printf("\t\t\t\t\t>はい\t\t いいえ");
+
+        if(mode == 1)
+          printf("\t\t\t\t\t はい\t\t>いいえ");
+
+        in = getch();
+
+        if(in == 13){
+
+          if(mode == 0){
+
+            for(i = 0; i < 6; i++){
+
+              if(GetPokimonId(i) != -1)
+                SetPokimonHp(i, GetPokimonMaxHp(i));
+
+              MapFadeOut();
+              MapFadeIn("pokisen");
+              printf("\n\n\n\t\t\t\tポキモンたちが元気になりました！ 【Enter】");
+              while(getch() != 13);
+              return 0;
+
+            }
+          }
+
+          if(mode == 1)
+            return 0;
+        }
+
+        if(in != 0)
+          continue;
+
+        in = getch();
+
+        if(in == 77)
+          if(mode < 1)
+            mode++;
+
+        if(in == 75)
+          if(mode > 0)
+            mode--;
+
+      }
   }
 
   SetPlayerX(GetPlayerX() + changeX);

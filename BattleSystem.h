@@ -11,8 +11,8 @@
 int Encount(void);
 int BattleFadeOut(int);
 int BattleFadeIn(void);
-int BattleTop(void);
-int BattleEscape(void);
+int BattleTop(int);
+int BattleEscape(int);
 int ctoi(char);
 /* プロトタイプ宣言 */
 
@@ -22,11 +22,12 @@ char ui[25][101], display[25][101];
 int Encount(void){
 
   int prob;
+  FILE *fp;
 
   srand((unsigned) time(NULL));
   // 確率 = 0~99の乱数生成 ÷ (基準歩数 + エンカウントレベル)
   prob = (rand() % 100) / STEPS;
-  prob = 1;
+  prob = 0;
 
   if(prob == 0){
 
@@ -121,7 +122,7 @@ int BattleFadeOut(int mode){
 
 }
 
-int BattleTop(void){
+int BattleTop(int id){
 
   int i, j, k, in, num, update = 1, mode = 0;
   char menu[7][17] = {
@@ -134,24 +135,24 @@ int BattleTop(void){
 			"                 "
   	},
   	message[75] = "やせいのポキモンがとびだしてきた！                                         ",
-  	center[16][75] = {
-  		"                                                                           ",
-  		"                                                                           ",
-  		"                                                                           ",
-  		"                                                                           ",
-  		"                                                                           ",
-  		"                                                                           ",
-  		"                                                                           ",
-  		"                                                                           ",
-  		"                                                                           ",
-  		"                                                                           ",
-  		"                                                                           ",
-  		"                                                                           ",
-  		"                                                                           ",
-  		"                                                                           ",
-  		"                                                                           ",
-  		"                                                                           "
-  	};
+    center[17][76], file_name[20];
+    FILE *fp;
+
+    sprintf(file_name, "AA/%d.txt", id);
+
+    if((fp = fopen(file_name, "r")) == NULL)
+      return -1;
+
+    for(i = 0; i < 17; i++)
+      fgets(center[i], 76, fp);
+
+    system("cls");
+
+    for(i = 0; i < 17; i++)
+      printf("%s\n", center[i]);
+
+    getch();
+
 
   while(1){
 
@@ -186,7 +187,7 @@ int BattleTop(void){
           		num = ctoi(display[i][j + 2]);
 
           		for(k = 0; k < 75; k++)
-          			display[i][j + k] = center[num][k];
+          			  display[i][j + k] = center[num][k];
 
           	}
 
@@ -195,7 +196,7 @@ int BattleTop(void){
           		num = ctoi(display[i][j + 2]);
 
           		for(k = 0; k < 75; k++)
-          			display[i][j + k] = center[num][k];
+          			  display[i][j + k] = center[10 + num][k];
 
           	}
           }
@@ -237,7 +238,7 @@ int BattleTop(void){
 
       if(mode == 2){
 
-        BattleEscape();
+        BattleEscape(id);
         break;
 
       }
@@ -267,7 +268,7 @@ int BattleTop(void){
 
 }
 
-int BattleEscape(void){
+int BattleEscape(int id){
 
   int i, j, k, in, num;
   char menu[7][17] = {
@@ -278,7 +279,20 @@ int BattleEscape(void){
     "                 ",
     "                 ",
     "                 "
-  }, message[75] = "うまくにげきることができた！                                               ";
+  }, message[75] = "うまくにげきることができた！                                               ",
+  center[17][76], file_name[20];
+  FILE *fp;
+
+  sprintf(file_name, "AA/%d.txt", id);
+
+  if((fp = fopen(file_name, "r")) == NULL)
+    return -1;
+
+  for(i = 0; i < 17; i++)
+    fgets(center[i], 76, fp);
+
+  for(i = 0; i < 25; i++)
+    strcpy(display[i], ui[i]);
 
   system("cls");
 
@@ -286,31 +300,41 @@ int BattleEscape(void){
 
     for(j = 0; j < 101; j++){
 
-      if(ui[i][j] == '%'){
+      if(display[i][j] == '%'){
 
-        switch(ctoi(ui[i][j + 1])){
+        if(ctoi(display[i][j + 1]) == 0){
 
-          case 0:
+          num = ctoi(display[i][j + 2]);
 
-            for(k = 0; k < 17; k++)
-              display[i][j + k] = menu[ctoi(ui[i][j + 2])][k];
+          for(k = 0; k < 17; k++){
 
-            break;
+            display[i][j + k] = menu[num][k];
 
-          case 1:
+          }
+        }
 
-            for(k = 0; k < 75; k++)
-              display[i][j + k] = message[k];
+        if(ctoi(display[i][j + 1]) == 1){
 
-            break;
+          for(k = 0; k < 75; k++)
+            display[i][j + k] = message[k];
 
-          case 2:
-          case 3:
+        }
 
-            for(k = 0; k < 3; k++)
-              display[i][j + k] = '   ';
+        if(ctoi(display[i][j + 1]) == 2){
 
-            break;
+          num = ctoi(display[i][j + 2]);
+
+          for(k = 0; k < 75; k++)
+              display[i][j + k] = center[num][k];
+
+        }
+
+        if(ctoi(display[i][j + 1]) == 3){
+
+          num = ctoi(display[i][j + 2]);
+
+          for(k = 0; k < 75; k++)
+              display[i][j + k] = center[10 + num][k];
 
         }
       }
@@ -320,7 +344,36 @@ int BattleEscape(void){
   for(i = 0; i < 25; i++)
     printf("%s", display[i]);
 
+  getch();
+
   return 0;
+
+}
+
+int RandomPokimon(void){
+
+  int i = 0, id;
+  FILE *fp;
+
+  if((fp = fopen("Data/Pokimons.txt", "r")) == NULL)
+    return -1;
+
+  while(1){
+
+    fseek(fp, i * 50L, SEEK_SET);
+
+    if(fscanf(fp, "%5d", &id) == EOF)
+      break;
+
+    i++;
+
+  }
+
+  if(i == 0)
+    return -1;
+
+  srand((unsigned) time(NULL));
+  return rand() % i;
 
 }
 

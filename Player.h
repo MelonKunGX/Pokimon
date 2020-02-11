@@ -2,9 +2,6 @@
 #include<stdlib.h>
 #include<string.h>
 
-#define SUCCESS 0
-#define FAILED -1
-
 static int IsLoaded = 0;
 
 static struct pokimons{
@@ -60,26 +57,25 @@ int SetPokimonSp(int, int);
 int CreatePlayerData(char *name){
 
   int result, i = 0;
-  char find_name[20], dummy[1];
+  char find_name[20];
   FILE *fp;
 
   if((fp = fopen("Data/players.txt", "r")) == NULL)
-    return FAILED;
+    return -1;
 
   while(1){
 
-    fseek(fp, i * 320L, SEEK_SET);
+    fseek(fp, i * 350L, SEEK_SET);
 
-    if(fscanf(fp, "%*5d%20s%*331c", find_name) == EOF)
+    if(fscanf(fp, "%*5d%20s", find_name) == EOF)
 			break;
 
     if(strcmp(name, find_name) == 0)
-    	return FAILED;
+    	return -1;
+
+    i++;
 
   }
-
-  while(fgets(dummy, 1, fp) != NULL)
-    i++;
 
   fclose(fp);
 
@@ -103,10 +99,10 @@ int CreatePlayerData(char *name){
 
   IsLoaded = 1;
 
-  if(SavePlayerData() == FAILED)
-    return FAILED;
+  if(SavePlayerData() == -1)
+    return -1;
 
-  return SUCCESS;
+  return 0;
 
 }
 
@@ -115,7 +111,7 @@ int GetPlayerId(void){
   if(IsLoaded)
     return player.id;
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -124,7 +120,7 @@ char *GetPlayerName(void){
   if(IsLoaded)
     return player.name;
 
-  return "FAILED";
+  return "-1";
 
 }
 
@@ -133,7 +129,7 @@ int GetPlayerX(void){
   if(IsLoaded)
     return player.x;
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -142,7 +138,7 @@ int GetPlayerY(void){
   if(IsLoaded)
     return player.y;
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -151,7 +147,7 @@ char *GetPlayerInMap(void){
   if(IsLoaded)
     return player.map;
 
-  return "FAILED";
+  return "-1";
 
 }
 
@@ -161,7 +157,7 @@ int GetPokimonId(int index){
     if(index >= 0 && index <= 5)
       return player.pokimon[index].id;
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -171,7 +167,7 @@ char GetPokimonName(int index){
     if(index >= 0 && index <= 5)
       return *player.pokimon[index].name;
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -181,7 +177,7 @@ int GetPokimonAtk(int index){
     if(index >= 0 && index <= 5)
       return player.pokimon[index].atk;
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -191,7 +187,7 @@ int GetPokimonDef(int index){
     if(index >= 0 && index <= 5)
       return player.pokimon[index].def;
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -201,7 +197,7 @@ int GetPokimonMaxHp(int index){
     if(index >= 0 && index <= 5)
       return player.pokimon[index].max_hp;
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -211,7 +207,7 @@ int GetPokimonHp(int index){
     if(index >= 0 && index <= 5)
       return player.pokimon[index].hp;
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -221,7 +217,7 @@ int GetPokimonSp(int index){
     if(index >= 0 && index <= 5)
       return player.pokimon[index].sp;
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -230,9 +226,9 @@ int LoadPlayerData(int id){
   FILE *fp;
 
   if((fp = fopen("Data/players.txt", "r")) == NULL)
-    return FAILED;
+    return -1;
 
-  fseek(fp, id * 320L, SEEK_SET);
+  fseek(fp, id * 350L, SEEK_SET);
 
   if(fscanf(fp, "%5d%20s%5d%5d%20s%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d",
     &player.id, player.name, &player.x, &player.y, player.map,
@@ -246,12 +242,12 @@ int LoadPlayerData(int id){
 
     IsLoaded = 1;
     fclose(fp);
-    return SUCCESS;
+    return 0;
 
   }
 
   fclose(fp);
-  return FAILED;
+  return -1;
 
 }
 
@@ -260,7 +256,7 @@ int PrintPlayerData(void){
   int i;
 
   if(!IsLoaded)
-    return FAILED;
+    return -1;
 
   printf("ID: %d\n", player.id);
   printf("–¼‘O: %s\n", player.name);
@@ -281,7 +277,7 @@ int PrintPlayerData(void){
 
   }
 
-  return SUCCESS;
+  return 0;
 
 }
 
@@ -290,12 +286,12 @@ int SavePlayerData(void){
   FILE *fp;
 
   if(!IsLoaded)
-    return FAILED;
+    return -1;
 
   if((fp = fopen("Data/players.txt", "r+")) == NULL)
-    return FAILED;
+    return -1;
 
-  fseek(fp, player.id * 320L, SEEK_SET);
+  fseek(fp, player.id * 350L, SEEK_SET);
 
   fprintf(fp, "%5d%20s%5d%5d%20s%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d",
     player.id, player.name, player.x, player.y, player.map,
@@ -307,7 +303,7 @@ int SavePlayerData(void){
     player.pokimon[0].id, player.pokimon[5].name, player.pokimon[5].atk, player.pokimon[5].def, player.pokimon[5].max_hp, player.pokimon[5].hp, player.pokimon[5].sp
   );
   fclose(fp);
-  return SUCCESS;
+  return 0;
 
 }
 
@@ -316,11 +312,11 @@ int SetPlayerId(int value){
   if(IsLoaded){
 
     player.id = value;
-    return SUCCESS;
+    return 0;
 
   }
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -329,11 +325,11 @@ int SetPlayerName(char *value){
   if(IsLoaded){
 
     strcpy(player.name, value);
-    return SUCCESS;
+    return 0;
 
   }
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -342,11 +338,11 @@ int SetPlayerX(int value){
   if(IsLoaded){
 
     player.x = value;
-    return SUCCESS;
+    return 0;
 
   }
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -355,11 +351,11 @@ int SetPlayerY(int value){
   if(IsLoaded){
 
     player.y = value;
-    return SUCCESS;
+    return 0;
 
   }
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -368,11 +364,11 @@ int SetPlayerInMap(char *value){
   if(IsLoaded){
 
     strcpy(player.map, value);
-    return SUCCESS;
+    return 0;
 
   }
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -383,12 +379,12 @@ int SetPokimonId(int index, int value){
     if(index >= 0 && index <= 5){
 
       player.pokimon[index].id = value;
-      return SUCCESS;
+      return 0;
 
     }
   }
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -399,12 +395,12 @@ int SetPokimonName(int index, char *value){
     if(index >= 0 && index <= 5){
 
       strcpy(player.pokimon[index].name, value);
-      return SUCCESS;
+      return 0;
 
     }
   }
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -415,12 +411,12 @@ int SetPokimonAtk(int index, int value){
     if(index >= 0 && index <= 5){
 
       player.pokimon[index].atk = value;
-      return SUCCESS;
+      return 0;
 
     }
   }
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -431,12 +427,12 @@ int SetPokimonDef(int index, int value){
     if(index >= 0 && index <= 5){
 
       player.pokimon[index].def = value;
-      return SUCCESS;
+      return 0;
 
     }
   }
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -447,12 +443,12 @@ int SetPokimonMaxHp(int index, int value){
     if(index >= 0 && index <= 5){
 
       player.pokimon[index].max_hp = value;
-      return SUCCESS;
+      return 0;
 
     }
   }
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -463,12 +459,12 @@ int SetPokimonHp(int index, int value){
     if(index >= 0 && index <= 5){
 
       player.pokimon[index].hp = value;
-      return SUCCESS;
+      return 0;
 
     }
   }
 
-  return FAILED;
+  return -1;
 
 }
 
@@ -479,11 +475,11 @@ int SetPokimonSp(int index, int value){
     if(index >= 0 && index <= 5){
 
       player.pokimon[index].sp = value;
-      return SUCCESS;
+      return 0;
 
     }
   }
 
-  return FAILED;
+  return -1;
 
 }

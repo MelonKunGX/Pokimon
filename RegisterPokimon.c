@@ -10,7 +10,7 @@ int main(void){
 	printf("- ƒ|ƒLƒ‚ƒ““o˜^ -\n");
 
 	while(1){
-	
+
 		printf("ID‚ð“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B\n(I—¹‚Í -1 ‚ð“ü—Í)\n");
 		printf(">");
 		scanf("%d", &id);
@@ -29,7 +29,7 @@ int main(void){
 			scanf("%d", &type);
 
 		}while(type < 0 || type > 2);
-		
+
 		printf("UŒ‚—Í‚ð“ü—Í‚µ‚Ä‚­‚¾‚³‚¢\n");
 		printf(">");
 		scanf("%d", &atk);

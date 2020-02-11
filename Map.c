@@ -10,8 +10,10 @@ int x, y; //プレイヤー座標
 char map[25][101];
 FILE *map1;
 
-int key(void);
-int playerMove(int, int);
+int Key(void);
+int PlayerMove(int, int);
+int MapFadeIn(char*);
+int MapFadeOut(void);
 
 int main(void){
 
@@ -25,8 +27,9 @@ int main(void){
 
   }
 
-  x = 1;
-  y = 1;
+  LoadPlayerData(0);
+  x = GetPlayerX();
+  y = GetPlayerY();
 
   for(i = 0; i < 25; i ++)
     fgets(map[i], 102, map1);
@@ -60,7 +63,7 @@ int main(void){
 
     do{
 
-      result = key();
+      result = Key();
 
     }while(result == 2);
   }
@@ -72,7 +75,7 @@ int main(void){
 
 }
 
-int key(void){
+int Key(void){
 
   int in, result;
 
@@ -90,25 +93,25 @@ int key(void){
 
     case 72:
 
-      result = playerMove(0, -1);
+      result = PlayerMove(0, -1);
 
       break;
 
     case 80:
 
-      result = playerMove(0, 1);
+      result = PlayerMove(0, 1);
 
       break;
 
     case 77:
 
-      result = playerMove(1, 0);
+      result = PlayerMove(1, 0);
 
       break;
 
     case 75:
 
-      result = playerMove(-1, 0);
+      result = PlayerMove(-1, 0);
 
       break;
 
@@ -125,7 +128,7 @@ int key(void){
 
 }
 
-int playerMove(int changeX, int changeY){
+int PlayerMove(int changeX, int changeY){
 
   switch(map[y + changeY][x + changeX]){
 
@@ -139,8 +142,10 @@ int playerMove(int changeX, int changeY){
       if(Encount() == 1){
 
         BattleFadeOut(0);
-        BattleFadeIn(0);
+        BattleFadeIn();
         BattleTop();
+        BattleFadeOut(1);
+        MapFadeIn(GetPlayerInMap());
 
       }
 
@@ -153,6 +158,67 @@ int playerMove(int changeX, int changeY){
 
   SetPlayerX(x);
   SetPlayerY(y);
+
+  return 0;
+
+}
+
+int MapFadeIn(char *name){
+
+  int i, j;
+  char file_name[20], effect[25][101];
+  FILE *fp;
+
+  sprintf(file_name, "Maps/%s.txt", name);
+
+  if((fp = fopen(file_name, "r")) == NULL)
+    return -1;
+
+  for(i = 0; i < 25; i++)
+    fgets(effect[i], 101, fp);
+
+  for(i = 0; i < 25; i++)
+    for(j = 0; j < 101; j++)
+      map[i][j] = ' ';
+
+  for(i = 0; i < 25; i++){
+
+    strcpy(map[12 - i], effect[12 - i]);
+    strcpy(map[13 + i], effect[13 + i]);
+    system("cls");
+
+    for(j = 0; j < 25; j++)
+      printf("%s", map[j]);
+
+    Sleep(10);
+
+  }
+
+  return 0;
+
+}
+
+int MapFadeOut(void){
+
+  int i, j;
+
+  for(i = 0; i < 25; i++){
+
+    system("cls");
+
+    for(j = 0; j < 101; j++){
+
+      map[i][j] = ' ';
+      map[24 - i][j] = ' ';
+
+    }
+
+    for(j = 0; j < 25; j++)
+      printf("%s", display[j]);
+
+    Sleep(10);
+
+  }
 
   return 0;
 

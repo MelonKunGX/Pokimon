@@ -10,7 +10,7 @@
 /* プロトタイプ宣言 */
 int Encount(void);
 int BattleFadeOut(int);
-int BattleFadeIn(int);
+int BattleFadeIn(void);
 int BattleTop(void);
 int BattleEscape(void);
 int ctoi(char);
@@ -41,69 +41,37 @@ int Encount(void){
   }
 }
 
-int BattleFadeIn(int mode){
+int BattleFadeIn(void){
 
   int i, j, k;
   char effect[25][101];
   FILE *fp;
 
-  if(mode == 0){
+  if((fp = fopen("UI/BattleUI.txt", "r")) == NULL)
+    return -1;
 
-    if((fp = fopen("UI/BattleUI.txt", "r")) == NULL)
-      return -1;
+  for(i = 0; i < 25; i++)
+    fgets(effect[i], 101, fp);
 
-    for(i = 0; i < 25; i++)
-      fgets(effect[i], 101, fp);
+  for(i = 0; i < 25; i++)
+    for(j = 0; j < 101; j++)
+      display[i][j] = ' ';
 
-    for(i = 0; i < 25; i++)
-      for(j = 0; j < 101; j++)
-        display[i][j] = ' ';
+  for(i = 0; i < 13; i++){
 
+    strcpy(display[12 - i], effect[12 - i]);
+    strcpy(display[13 + i], effect[13 + i]);
     system("cls");
 
-    for(i = 0; i < 13; i++){
+    for(k = 0; k < 25; k++)
+      printf("%s", display[k]);
 
-      strcpy(display[12 - i], effect[12 - i]);
-      strcpy(display[13 + i], effect[13 + i]);
-      system("cls");
-
-      for(k = 0; k < 25; k++)
-        printf("%s", display[k]);
-
-      Sleep(10);
-
-    }
-
-    for(i = 0; i < 25; i++)
-      strcpy(ui[i], display[i]);
+    Sleep(10);
 
   }
 
-  if(mode == 1){
-
-    if((fp = fopen("Maps/map1.txt", "r")) == NULL)
-      return -1;
-
-    for(i = 0; i < 25; i++)
-      for(j = 0; j < 101; j++)
-        display[i][j] = ' ';
-
-    for(i = 0; i < 25; i++)
-      fgets(effect[i], 101, fp);
-
-    for(i = 0; i < 13; i++){
-
-      strcpy(display[12 - i], effect[12 - i]);
-      strcpy(display[13 + i], effect[13 + i]);
-      system("cls");
-
-      for(k = 0; k < 25; k++)
-        printf("%s", display[k]);
-
-      Sleep(10);
-
-    }
-  }
+  for(i = 0; i < 25; i++)
+    strcpy(ui[i], display[i]);
 
   return 0;
 
@@ -122,17 +90,18 @@ int BattleFadeOut(int mode){
     for(i = 0; i < 25; i++)
       fgets(display[i], 101, fp);
 
+    system("cls");
+
+    for(i = 0; i < 25; i++)
+      printf("%s", display[i]);
+
   }
 
-  system("cls");
-
-  for(i = 0; i < 25; i++)
-    printf("%s", display[i]);
-
   Sleep(1000);
-  system("cls");
 
   for(i = 0; i < 25; i++){
+
+    system("cls");
 
     for(j = 0; j < 99; j++){
 
@@ -145,7 +114,6 @@ int BattleFadeOut(int mode){
       printf("%s", display[k]);
 
     Sleep(10);
-    system("cls");
 
   }
 
@@ -221,9 +189,9 @@ int BattleTop(void){
           			display[i][j + k] = center[num][k];
 
           	}
-          	
+
           	if(ctoi(display[i][j + 1]) == 3){
-          	
+
           		num = ctoi(display[i][j + 2]);
 
           		for(k = 0; k < 75; k++)
@@ -351,9 +319,6 @@ int BattleEscape(void){
 
   for(i = 0; i < 25; i++)
     printf("%s", display[i]);
-
-  BattleFadeOut(1);
-  BattleFadeIn(1);
 
   return 0;
 

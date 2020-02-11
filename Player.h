@@ -21,6 +21,7 @@ static struct players{
   char name[20];
   int x;
   int y;
+  char map[20];
   struct pokimons pokimon[6];
 }player;
 
@@ -30,6 +31,7 @@ int GetPlayerId(void);
 char GetPlayerName(void);
 int GetPlayerX(void);
 int GetPlayerY(void);
+char *GetPlayerInMap(void);
 int GetPokimonId(int);
 char GetPokimonName(int);
 int GetPokimonAtk(int);
@@ -43,6 +45,7 @@ int SetPlayerId(int);
 int SetPlayerName(char*);
 int SetPlayerX(int);
 int SetPlayerY(int);
+int SetPlayerInMap(char*);
 int SetPokimonId(int, int);
 int SetPokimonName(int, char*);
 int SetPokimonAtk(int, int);
@@ -80,6 +83,7 @@ int CreatePlayerData(char *name){
   strcpy(player.name, name);
   player.x = 1;
   player.y = 1;
+  strcpy(player.map, "map1");
 
   for(i = 0; i < 6; i ++){
 
@@ -134,6 +138,15 @@ int GetPlayerY(void){
     return player.y;
 
   return FAILED;
+
+}
+
+char *GetPlayerInMap(void){
+
+  if(IsLoaded)
+    return player.map;
+
+  return "-1";
 
 }
 
@@ -206,8 +219,8 @@ int LoadPlayerData(int id){
 
   fseek(fp, id * 300L, SEEK_SET);
 
-  if(fscanf(fp, "%5d%20s%5d%5d%5d%20s%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d",
-    &player.id, player.name, &player.x, &player.y,
+  if(fscanf(fp, "%5d%20s%5d%5d%20s%5d%20s%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d",
+    &player.id, player.name, &player.x, &player.y, player.map,
     &player.pokimon[0].id, player.pokimon[0].name, &player.pokimon[0].atk, &player.pokimon[0].def, &player.pokimon[0].hp, &player.pokimon[0].sp,
     &player.pokimon[1].id, player.pokimon[1].name, &player.pokimon[1].atk, &player.pokimon[1].def, &player.pokimon[1].hp, &player.pokimon[1].sp,
     &player.pokimon[2].id, player.pokimon[2].name, &player.pokimon[2].atk, &player.pokimon[2].def, &player.pokimon[2].hp, &player.pokimon[2].sp,
@@ -238,6 +251,7 @@ int PrintPlayerData(void){
   printf("名前: %s\n", player.name);
   printf("X座標: %d\n", player.x);
   printf("Y座標: %d\n", player.y);
+  printf("マップ: %s\n", player.map);
 
   for(i = 0; i < 6; i ++){
 
@@ -267,10 +281,10 @@ int SavePlayerData(void){
     return FAILED;
 
   fseek(fp, player.id * 300L, SEEK_SET);
-  fprintf(fp, "%5d%20s%5d%5d", player.id, player.name, player.x, player.y);
+  fprintf(fp, "%5d%20s%5d%5d%20s", player.id, player.name, player.x, player.y, player.map);
 
   for(i = 0; i < 6; i++){
-  
+
   	fprintf(fp, "%5d%20s%5d%5d%5d%5d",
       player.pokimon[i].id,
       player.pokimon[i].name,
@@ -334,6 +348,19 @@ int SetPlayerY(int y){
   if(IsLoaded){
 
     player.y = y;
+    return SUCCESS;
+
+  }
+
+  return FAILED;
+
+}
+
+int SetPlayerInMap(char *map){
+
+  if(IsLoaded){
+
+    strcpy(player.map, map);
     return SUCCESS;
 
   }

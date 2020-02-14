@@ -16,7 +16,6 @@ int BattleEscape(int);
 int ctoi(char);
 /* プロトタイプ宣言 */
 
-float enc_lv = 0.0;
 char ui[25][101], display[25][101];
 
 int Encount(void){
@@ -27,19 +26,14 @@ int Encount(void){
   srand((unsigned) time(NULL));
   // 確率 = 0～99の乱数生成 ÷ (基準歩数 + エンカウントレベル)
   prob = (rand() % 100) / STEPS;
-  prob = 0;
+  prob = 1;
 
-  if(prob == 0){
-
-    //enc_lv = 0;
+  if(prob == 0)
     return 1;
 
-  }else{
-
-    //enc_lv += 0.5;
+  else
     return 0;
 
-  }
 }
 
 int BattleFadeIn(void){

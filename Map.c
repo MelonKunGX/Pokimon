@@ -22,7 +22,11 @@ int main(void){
 	system("mode 100,30");
   LoadPlayerData(0);
 
-  sprintf(file_name, "Maps/%s.txt", GetPlayerInMap());
+  if(strstr(GetPlayerInMap(), "pokisen") != NULL)
+    strcpy(file_name, "Maps/pokisen.txt");
+
+  else
+    sprintf(file_name, "Maps/%s.txt", GetPlayerInMap());
 
   if((fp = fopen(file_name, "r")) == NULL){
 
@@ -34,7 +38,9 @@ int main(void){
   for(i = 0; i < 25; i ++)
     fgets(map[i], 102, fp);
 
-  while(result != 1){
+  fclose(fp);
+
+  while(1){
 
     system("cls");
 
@@ -76,9 +82,12 @@ int main(void){
       result = Key();
 
     }while(result == 2);
+
+    if(result == 1)
+      break;
+
   }
 
-  fclose(fp);
   SavePlayerData();
   system("cls");
 
@@ -142,7 +151,7 @@ int Key(void){
 int PlayerMove(int changeX, int changeY){
 
   int i, in, mode;
-  static char before_map[20];
+  static char before_map[20], pokisen_num[20];
 
   switch(map[GetPlayerY() + changeY][GetPlayerX() + changeX]){
 
@@ -218,7 +227,8 @@ int PlayerMove(int changeX, int changeY){
       strcpy(before_map, GetPlayerInMap());
       MapFadeOut();
       MapFadeIn("pokisen");
-      SetPlayerInMap("pokisen");
+      sprintf(pokisen_num, "pokisen%c", GetPlayerInMap()[3]);
+      SetPlayerInMap(pokisen_num);
       SetPlayerX(48);
       SetPlayerY(14);
 
@@ -227,27 +237,26 @@ int PlayerMove(int changeX, int changeY){
     case 'E':
 
       MapFadeOut();
-      MapFadeIn(before_map);
-      SetPlayerInMap(before_map);
+      sprintf(pokisen_num, "map%c", GetPlayerInMap()[7]);
+      MapFadeIn(pokisen_num);
+      SetPlayerInMap(pokisen_num);
 
-      if(strcmp(GetPlayerInMap(), "map1") == 0){
+      switch(GetPlayerInMap()[7]){
 
-        SetPlayerX(63);
-        SetPlayerY(10);
+        case '1':
+          SetPlayerX(63);
+          SetPlayerY(10);
+          break;
 
-      }
+        case '2':
+          SetPlayerX(80);
+          SetPlayerY(5);
+          break;
 
-      if(strcmp(GetPlayerInMap(), "map2") == 0){
-
-        SetPlayerX(80);
-        SetPlayerY(5);
-
-      }
-
-      if(strcmp(GetPlayerInMap(), "map3") == 0){
-
-        SetPlayerX(57);
-        SetPlayerY(9);
+        case '3':
+          SetPlayerX(57);
+          SetPlayerY(9);
+          break;
 
       }
 
@@ -337,7 +346,7 @@ int MapFadeIn(char *name){
     for(j = 0; j < 101; j++)
       map[i][j] = ' ';
 
-  for(i = 0; i < 12; i++){
+  for(i = 0; i < 13; i++){
 
     strcpy(map[12 - i], effect[12 - i]);
 

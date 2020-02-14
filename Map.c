@@ -7,7 +7,6 @@
 #include "Pokimon.h"
 
 char map[25][101];
-FILE *fp;
 
 int Key(void);
 int PlayerMove(int, int);
@@ -18,7 +17,9 @@ int main(void){
 
   int i, j, chr, result = 0; //ÉVÉXÉeÉÄÇ…ä÷Ç∑ÇÈïœêî
   char before[1] = {' '}, file_name[20];
+  FILE *fp;
 
+	system("mode 100,30");
   LoadPlayerData(0);
 
   sprintf(file_name, "Maps/%s.txt", GetPlayerInMap());
@@ -204,8 +205,6 @@ int PlayerMove(int changeX, int changeY){
 
         BattleFadeOut(0);
         BattleFadeIn();
-        printf("%d\n", RandomPokimon());
-        getch();
         BattleTop(RandomPokimon());
         BattleFadeOut(1);
         MapFadeIn(GetPlayerInMap());
@@ -338,10 +337,13 @@ int MapFadeIn(char *name){
     for(j = 0; j < 101; j++)
       map[i][j] = ' ';
 
-  for(i = 0; i < 25; i++){
+  for(i = 0; i < 12; i++){
 
     strcpy(map[12 - i], effect[12 - i]);
-    strcpy(map[13 + i], effect[13 + i]);
+
+    if(i != 12)
+    	strcpy(map[13 + i], effect[13 + i]);
+
     system("cls");
 
     for(j = 0; j < 25; j++)

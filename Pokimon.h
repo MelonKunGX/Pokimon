@@ -14,6 +14,8 @@ struct status{
 
 }pokimon;
 
+int Pokimon_IsLoaded = 0;
+
 /*
 * 返り値
 * -1: ファイルがーオープンできない。
@@ -74,9 +76,12 @@ int LoadPokimon(int id){
         &pokimon.id, pokimon.name, &pokimon.type, &pokimon.atk, &pokimon.def, &pokimon.hp, &pokimon.sp
       );
       fclose(fp);
+			Pokimon_IsLoaded = 1;
 
       return 0;
 
     }
   }
 }
+
+//int GetDefaultId(void){}

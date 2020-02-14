@@ -25,7 +25,7 @@ int Encount(void){
   FILE *fp;
 
   srand((unsigned) time(NULL));
-  // 確率 = 0~99の乱数生成 ÷ (基準歩数 + エンカウントレベル)
+  // 確率 = 0～99の乱数生成 ÷ (基準歩数 + エンカウントレベル)
   prob = (rand() % 100) / STEPS;
   prob = 0;
 
@@ -61,7 +61,10 @@ int BattleFadeIn(void){
   for(i = 0; i < 13; i++){
 
     strcpy(display[12 - i], effect[12 - i]);
-    strcpy(display[13 + i], effect[13 + i]);
+
+    if(i != 13)
+    	strcpy(display[13 + i], effect[13 + i]);
+
     system("cls");
 
     for(k = 0; k < 25; k++)
@@ -144,15 +147,7 @@ int BattleTop(int id){
       return -1;
 
     for(i = 0; i < 17; i++)
-      fgets(center[i], 76, fp);
-
-    system("cls");
-
-    for(i = 0; i < 17; i++)
-      printf("%s\n", center[i]);
-
-    getch();
-
+      fgets(center[i], 80, fp);
 
   while(1){
 
@@ -186,8 +181,8 @@ int BattleTop(int id){
 
           		num = ctoi(display[i][j + 2]);
 
-          		for(k = 0; k < 75; k++)
-          			  display[i][j + k] = center[num][k];
+          		for(k = 0; k < 75, center[num][k] != '\n'; k++)
+          			display[i][j + k] = center[num][k];
 
           	}
 
@@ -195,8 +190,8 @@ int BattleTop(int id){
 
           		num = ctoi(display[i][j + 2]);
 
-          		for(k = 0; k < 75; k++)
-          			  display[i][j + k] = center[10 + num][k];
+          		for(k = 0; k < 75, center[10 + num][k] != '\n'; k++)
+          			display[i][j + k] = center[10 + num][k];
 
           	}
           }
@@ -289,7 +284,7 @@ int BattleEscape(int id){
     return -1;
 
   for(i = 0; i < 17; i++)
-    fgets(center[i], 76, fp);
+    fgets(center[i], 80, fp);
 
   for(i = 0; i < 25; i++)
     strcpy(display[i], ui[i]);
@@ -324,7 +319,7 @@ int BattleEscape(int id){
 
           num = ctoi(display[i][j + 2]);
 
-          for(k = 0; k < 75; k++)
+          for(k = 0; k < 75, center[num][k] != '\n'; k++)
               display[i][j + k] = center[num][k];
 
         }
@@ -333,7 +328,7 @@ int BattleEscape(int id){
 
           num = ctoi(display[i][j + 2]);
 
-          for(k = 0; k < 75; k++)
+          for(k = 0; k < 75, center[10 + num][k] != '\n'; k++)
               display[i][j + k] = center[10 + num][k];
 
         }
@@ -344,15 +339,13 @@ int BattleEscape(int id){
   for(i = 0; i < 25; i++)
     printf("%s", display[i]);
 
-  getch();
-
   return 0;
 
 }
 
 int RandomPokimon(void){
 
-  int i = 0, id;
+  int c, id = 0;
   FILE *fp;
 
   if((fp = fopen("Data/Pokimons.txt", "r")) == NULL)
@@ -360,20 +353,22 @@ int RandomPokimon(void){
 
   while(1){
 
-    fseek(fp, i * 50L, SEEK_SET);
+  	c = fgetc(fp);
 
-    if(fscanf(fp, "%5d", &id) == EOF)
-      break;
+  	if(c == EOF)
+  		break;
 
-    i++;
+  	if(c == '\n')
+  		id++;
 
   }
 
-  if(i == 0)
+  if(id == 0)
     return -1;
 
   srand((unsigned) time(NULL));
-  return rand() % i;
+
+  return rand() % id;
 
 }
 

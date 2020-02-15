@@ -15,12 +15,19 @@ int MapFadeOut(void);
 
 int main(void){
 
-  int i, j, chr, result = 0; //システムに関する変数
+  int i, j, chr, result;
   char before[1] = {' '}, file_name[20];
   FILE *fp;
 
 	system("mode 100,30");
   LoadPlayerData(0);
+
+  if(LoadPokimons() == -1){
+
+    printf("【エラー: ポキモンが読み込めませんでした。】\n");
+    return -1;
+
+  }
 
   if(strstr(GetPlayerInMap(), "pokisen") != NULL)
     strcpy(file_name, "Maps/pokisen.txt");
@@ -30,7 +37,7 @@ int main(void){
 
   if((fp = fopen(file_name, "r")) == NULL){
 
-    printf("【エラー: マップファイルが読み込めませんでした。】");
+    printf("【エラー: マップファイルが読み込めませんでした。】\n");
     return -1;
 
   }
@@ -88,9 +95,8 @@ int main(void){
 
   }
 
-  SavePlayerData();
+  SavePlayerData(1);
   system("cls");
-
   return 0;
 
 }
@@ -150,7 +156,7 @@ int Key(void){
 
 int PlayerMove(int changeX, int changeY){
 
-  int i, in, mode;
+  int i, in, mode, id;
   static char before_map[20], pokisen_num[20];
 
   switch(map[GetPlayerY() + changeY][GetPlayerX() + changeX]){
@@ -212,9 +218,11 @@ int PlayerMove(int changeX, int changeY){
 
       if(Encount() == 1){
 
+        id = RandomPokimon();
+
         BattleFadeOut(0);
         BattleFadeIn();
-        BattleTop(RandomPokimon());
+        BattleTop(id, GetDefaultPokimonName(id));
         BattleFadeOut(1);
         MapFadeIn(GetPlayerInMap());
 

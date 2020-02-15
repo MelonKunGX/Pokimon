@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define PokimonCount 3
+
+char *GetDefaultPokimonName(int);
+
 struct status{
 
   int id;
@@ -12,7 +16,7 @@ struct status{
   int hp;
   int sp;
 
-}pokimon;
+}pokimon[PokimonCount];
 
 int Pokimon_IsLoaded = 0;
 
@@ -32,7 +36,7 @@ int CreatePokimon(int id, char *name, int type, int atk, int def, int hp, int sp
 
   while(1){
 
-    fseek(fp, i * 50L, SEEK_SET);
+    fseek(fp, i * 52L, SEEK_SET);
 
     if(fscanf(fp, "%*5d%20s", find_name) == EOF)
       break;
@@ -50,38 +54,30 @@ int CreatePokimon(int id, char *name, int type, int atk, int def, int hp, int sp
 
 }
 
-/*
-* 返り値
-* -1: ファイルがーオープンできない。
-* -2: 指定したIDが見つからない。
-*/
-int LoadPokimon(int id){
+char *GetDefaultPokimonName(int id){
 
-  int i = 0, find_id;
+  return pokimon[id].name;
+
+}
+
+int LoadPokimons(void){
+
+  int i;
   FILE *fp;
 
   if((fp = fopen("Data/Pokimons.txt", "r")) == NULL)
     return -1;
 
-  while(1){
+  for(i = 0; i < PokimonCount; i++){
 
-    fseek(fp, i * 50L, SEEK_SET);
+    fseek(fp, i * 52L, SEEK_SET);
+    fscanf(fp, "%5d%20s%5d%5d%5d%5d%5d",
+      &pokimon[i].id, pokimon[i].name, &pokimon[i].type, &pokimon[i].atk, &pokimon[i].def, &pokimon[i].hp, &pokimon[i].sp
+    );
 
-    if(fscanf(fp, "%5d", &find_id) == EOF)
-      return -2;
-
-    if(find_id == id){
-
-      fscanf(fp, "%5d%20s%5d%5d%5d%5d%5d",
-        &pokimon.id, pokimon.name, &pokimon.type, &pokimon.atk, &pokimon.def, &pokimon.hp, &pokimon.sp
-      );
-      fclose(fp);
-			Pokimon_IsLoaded = 1;
-
-      return 0;
-
-    }
   }
-}
 
-//int GetDefaultId(void){}
+  fclose(fp);
+  return 0;
+
+}

@@ -14,6 +14,12 @@ static struct pokimons{
   int sp;
 };
 
+static struct items{
+  int id;
+  char name[20];
+  int count;
+};
+
 static struct players{
   int id;
   char name[20];
@@ -21,10 +27,12 @@ static struct players{
   int y;
   char map[20];
   struct pokimons pokimon[6];
+  struct items item[2];
 }player;
 
 /* プロトタイプ宣言 */
 int CreatePlayerData(char*);
+int GetItemCount(int);
 int GetPlayerId(void);
 char *GetPlayerName(void);
 int GetPlayerX(void);
@@ -39,7 +47,8 @@ int GetPokimonHp(int);
 int GetPokimonSp(int);
 int LoadPlayerData(int);
 int PrintPlayerData(void);
-int SavePlayerData(void);
+int SavePlayerData(int);
+int SetItemCount(int, int);
 int SetPlayerId(int);
 int SetPlayerName(char*);
 int SetPlayerX(int);
@@ -65,7 +74,7 @@ int CreatePlayerData(char *name){
 
   while(1){
 
-    fseek(fp, i * 350L, SEEK_SET);
+    fseek(fp, i * 367L, SEEK_SET);
 
     if(fscanf(fp, "%*5d%20s", find_name) == EOF)
 			break;
@@ -97,12 +106,29 @@ int CreatePlayerData(char *name){
 
   }
 
+  player.item[0].id = 0;
+  strcpy(player.item[0].name, "きずぐすり");
+  player.item[0].count = 0;
+  player.item[1].id = 1;
+  strcpy(player.item[1].name, "ポキモンボール");
+  player.item[1].count = 0;
+
   IsLoaded = 1;
 
-  if(SavePlayerData() == -1)
+  if(SavePlayerData(0) == -1)
     return -1;
 
   return 0;
+
+}
+
+int GetItemCount(int index){
+
+  if(IsLoaded)
+    if(index >= 0 && index <= 2)
+      return player.item[index].count;
+
+  return -1;
 
 }
 
@@ -228,17 +254,23 @@ int LoadPlayerData(int id){
   if((fp = fopen("Data/players.txt", "r")) == NULL)
     return -1;
 
-  fseek(fp, id * 350L, SEEK_SET);
+  fseek(fp, id * 367L, SEEK_SET);
 
-  if(fscanf(fp, "%5d%20s%5d%5d%20s%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d",
+  if(fscanf(fp, "%5d%20s%5d%5d%20s%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%5d",
     &player.id, player.name, &player.x, &player.y, player.map,
     &player.pokimon[0].id, player.pokimon[0].name, &player.pokimon[0].atk, &player.pokimon[0].def, &player.pokimon[0].max_hp, &player.pokimon[0].hp, &player.pokimon[0].sp,
     &player.pokimon[1].id, player.pokimon[1].name, &player.pokimon[1].atk, &player.pokimon[1].def, &player.pokimon[1].max_hp, &player.pokimon[1].hp, &player.pokimon[1].sp,
     &player.pokimon[2].id, player.pokimon[2].name, &player.pokimon[2].atk, &player.pokimon[2].def, &player.pokimon[2].max_hp, &player.pokimon[2].hp, &player.pokimon[2].sp,
     &player.pokimon[3].id, player.pokimon[3].name, &player.pokimon[3].atk, &player.pokimon[3].def, &player.pokimon[3].max_hp, &player.pokimon[3].hp, &player.pokimon[3].sp,
     &player.pokimon[0].id, player.pokimon[4].name, &player.pokimon[4].atk, &player.pokimon[4].def, &player.pokimon[4].max_hp, &player.pokimon[4].hp, &player.pokimon[4].sp,
-    &player.pokimon[0].id, player.pokimon[5].name, &player.pokimon[5].atk, &player.pokimon[5].def, &player.pokimon[5].max_hp, &player.pokimon[5].hp, &player.pokimon[5].sp
+    &player.pokimon[0].id, player.pokimon[5].name, &player.pokimon[5].atk, &player.pokimon[5].def, &player.pokimon[5].max_hp, &player.pokimon[5].hp, &player.pokimon[5].sp,
+    &player.item[0].count, &player.item[1].count
   ) != EOF){
+
+    player.item[0].id = 0;
+    strcpy(player.item[0].name, "きずぐすり");
+    player.item[1].id = 1;
+    strcpy(player.item[1].name, "ポキモンボール");
 
     IsLoaded = 1;
     fclose(fp);
@@ -277,33 +309,74 @@ int PrintPlayerData(void){
 
   }
 
+  for(i = 0; i < 2; i++){
+
+    printf("アイテム%d:\n", i + 1);
+    printf("\tID: %d\n", player.item[i].id);
+    printf("\t名前: %s\n", player.item[i].name);
+    printf("\t個数: %d\n", player.item[i].count);
+
+  }
+
   return 0;
 
 }
 
-int SavePlayerData(void){
+int SavePlayerData(int mode){
 
   FILE *fp;
 
   if(!IsLoaded)
     return -1;
 
-  if((fp = fopen("Data/players.txt", "r+")) == NULL)
-    return -1;
+  if(mode == 0){
 
-  fseek(fp, player.id * 350L, SEEK_SET);
+    if((fp = fopen("Data/players.txt", "a")) == NULL)
+      return -1;
 
-  fprintf(fp, "%5d%20s%5d%5d%20s%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d",
+    fseek(fp, player.id * 367L, SEEK_END);
+
+  }
+
+
+  if(mode == 1){
+
+    if((fp = fopen("Data/players.txt", "r+")) == NULL)
+      return -1;
+
+    fseek(fp, player.id * 367L, SEEK_SET);
+
+  }
+
+  fprintf(fp, "%5d%20s%5d%5d%20s%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%20s%5d%5d%5d%5d%5d%5d%5d\n",
     player.id, player.name, player.x, player.y, player.map,
     player.pokimon[0].id, player.pokimon[0].name, player.pokimon[0].atk, player.pokimon[0].def, player.pokimon[0].max_hp, player.pokimon[0].hp, player.pokimon[0].sp,
     player.pokimon[1].id, player.pokimon[1].name, player.pokimon[1].atk, player.pokimon[1].def, player.pokimon[1].max_hp, player.pokimon[1].hp, player.pokimon[1].sp,
     player.pokimon[2].id, player.pokimon[2].name, player.pokimon[2].atk, player.pokimon[2].def, player.pokimon[2].max_hp, player.pokimon[2].hp, player.pokimon[2].sp,
     player.pokimon[3].id, player.pokimon[3].name, player.pokimon[3].atk, player.pokimon[3].def, player.pokimon[3].max_hp, player.pokimon[3].hp, player.pokimon[3].sp,
     player.pokimon[0].id, player.pokimon[4].name, player.pokimon[4].atk, player.pokimon[4].def, player.pokimon[4].max_hp, player.pokimon[4].hp, player.pokimon[4].sp,
-    player.pokimon[0].id, player.pokimon[5].name, player.pokimon[5].atk, player.pokimon[5].def, player.pokimon[5].max_hp, player.pokimon[5].hp, player.pokimon[5].sp
+    player.pokimon[0].id, player.pokimon[5].name, player.pokimon[5].atk, player.pokimon[5].def, player.pokimon[5].max_hp, player.pokimon[5].hp, player.pokimon[5].sp,
+    player.item[0].count, player.item[1].count
   );
   fclose(fp);
+  printf("%ld\n", sizeof(player));
   return 0;
+
+}
+
+int SetItemCount(int index, int value){
+
+  if(IsLoaded){
+
+    if(index >= 0 && index <= 2){
+
+      player.item[index].count = value;
+      return 0;
+
+    }
+  }
+
+  return -1;
 
 }
 

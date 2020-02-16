@@ -22,6 +22,13 @@ int main(void){
 	system("mode 100,30");
   LoadPlayerData(0);
 
+  if(BattleInit() == -1){
+
+    printf("【エラー: BattleUIが読み込めませんでした。】\n");
+    return -1;
+
+  }
+
   if(LoadPokimons() == -1){
 
     printf("【エラー: ポキモンが読み込めませんでした。】\n");
@@ -351,7 +358,7 @@ int MapFadeIn(char *name){
     fgets(effect[i], 101, fp);
 
   for(i = 0; i < 25; i++)
-    for(j = 0; j < 101; j++)
+    for(j = 0; j < 99; j++)
       map[i][j] = ' ';
 
   for(i = 0; i < 13; i++){

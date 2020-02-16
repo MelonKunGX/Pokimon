@@ -11,8 +11,10 @@
 int Encount(void);
 int BattleFadeOut(int);
 int BattleFadeIn(void);
+int BattleInit(void);
 int BattleTop(int, char*);
-int BattleEscape(int);
+int BattleEscape(void);
+int ToDisplay(int);
 int ctoi(char);
 /* プロトタイプ宣言 */
 
@@ -45,18 +47,14 @@ int Encount(void){
 
 int BattleFadeIn(void){
 
-  int i, j, k;
+  int i, j;
   char effect[25][101];
-  FILE *fp;
-
-  if((fp = fopen("UI/BattleUI.txt", "r")) == NULL)
-    return -1;
 
   for(i = 0; i < 25; i++)
-    fgets(effect[i], 101, fp);
+    strcpy(effect[i], ui[i]);
 
   for(i = 0; i < 25; i++)
-    for(j = 0; j < 101; j++)
+    for(j = 0; j < 99; j++)
       display[i][j] = ' ';
 
   for(i = 0; i < 13; i++){
@@ -68,15 +66,12 @@ int BattleFadeIn(void){
 
     system("cls");
 
-    for(k = 0; k < 25; k++)
-      printf("%s", display[k]);
+    for(j = 0; j < 25; j++)
+      printf("%s", display[j]);
 
     Sleep(10);
 
   }
-
-  for(i = 0; i < 25; i++)
-    strcpy(ui[i], display[i]);
 
   return 0;
 
@@ -106,14 +101,14 @@ int BattleFadeOut(int mode){
 
   for(i = 0; i < 25; i++){
 
-    system("cls");
-
     for(j = 0; j < 99; j++){
 
       display[i][j] = ' ';
       display[24 - i][j] = ' ';
 
     }
+
+    system("cls");
 
     for(k = 0; k < 25; k++)
       printf("%s", display[k]);
@@ -126,9 +121,25 @@ int BattleFadeOut(int mode){
 
 }
 
+int BattleInit(void){
+
+  int i;
+  FILE *fp;
+
+  if((fp = fopen("UI/BattleUI.txt", "r")) == NULL)
+    return -1;
+
+  for(i = 0; i < 25; i++)
+    fgets(ui[i], 101, fp);
+
+  fclose(fp);
+  return 0;
+
+}
+
 int BattleTop(int id, char *name){
 
-  int i, j, k, in, num, update = 1, mode = 0;
+  int i, in, update = 1, mode = 0;
   char file_name[20];
   FILE *fp;
 
@@ -148,78 +159,13 @@ int BattleTop(int id, char *name){
   for(i = 0; i < 17; i++)
     fgets(part.center[i], 80, fp);
 
+  fclose(fp);
+
   while(1){
 
     if(update == 1){
 
-      for(i = 0; i < 25; i++){
-
-        for(j = 0; j < 101; j++){
-
-          if(display[i][j] == '%'){
-
-          	if(ctoi(display[i][j + 1]) == 0){
-
-          		num = ctoi(display[i][j + 2]);
-
-          		for(k = 0; k < 17; k++)
-          			display[i][j + k] = part.menu[num][k];
-
-          	}
-
-          	if(ctoi(display[i][j + 1]) == 1){
-
-          		for(k = 0; k < 75; k++)
-          			display[i][j + k] = part.message[k];
-
-          	}
-
-          	if(ctoi(display[i][j + 1]) == 2){
-
-          		num = ctoi(display[i][j + 2]);
-
-          		for(k = 0; k < 75, part.center[num][k] != '\n'; k++)
-          			display[i][j + k] = part.center[num][k];
-
-          	}
-
-          	if(ctoi(display[i][j + 1]) == 3){
-
-          		num = ctoi(display[i][j + 2]);
-
-          		for(k = 0; k < 75, part.center[10 + num][k] != '\n'; k++)
-          			display[i][j + k] = part.center[10 + num][k];
-
-          	}
-          }
-        }
-      }
-
-      display[2][2] = ' ';
-      display[5][2] = ' ';
-      display[8][2] = ' ';
-
-      switch(mode){
-
-        case 0:
-          display[2][2] = '>';
-          break;
-
-        case 1:
-          display[5][2] = '>';
-          break;
-
-        case 2:
-          display[8][2] = '>';
-          break;
-
-      }
-
-      system("cls");
-
-      for(i = 0; i < 25; i++)
-        printf("%s", display[i]);
-
+      ToDisplay(mode);
       update = 0;
 
     }
@@ -235,7 +181,7 @@ int BattleTop(int id, char *name){
 
       if(mode == 2){
 
-        BattleEscape(id);
+        BattleEscape();
         break;
 
       }
@@ -265,81 +211,11 @@ int BattleTop(int id, char *name){
 
 }
 
-int BattleEscape(int id){
+int BattleEscape(void){
 
-  int i, j, k, in, num;
-  char menu[7][17] = {
-    " たたかう        ",
-    " もちもの        ",
-    " にげる          ",
-    "                 ",
-    "                 ",
-    "                 ",
-    "                 "
-  }, message[75] = "うまくにげきることができた！                                               ",
-  center[17][76], file_name[20];
-  FILE *fp;
-
-  sprintf(file_name, "AA/%d.txt", id);
-
-  if((fp = fopen(file_name, "r")) == NULL)
-    return -1;
-
-  for(i = 0; i < 17; i++)
-    fgets(center[i], 80, fp);
-
-  for(i = 0; i < 25; i++)
-    strcpy(display[i], ui[i]);
-
-  system("cls");
-
-  for(i = 0; i < 25; i++){
-
-    for(j = 0; j < 101; j++){
-
-      if(display[i][j] == '%'){
-
-        if(ctoi(display[i][j + 1]) == 0){
-
-          num = ctoi(display[i][j + 2]);
-
-          for(k = 0; k < 17; k++){
-
-            display[i][j + k] = menu[num][k];
-
-          }
-        }
-
-        if(ctoi(display[i][j + 1]) == 1){
-
-          for(k = 0; k < 75; k++)
-            display[i][j + k] = message[k];
-
-        }
-
-        if(ctoi(display[i][j + 1]) == 2){
-
-          num = ctoi(display[i][j + 2]);
-
-          for(k = 0; k < 75, center[num][k] != '\n'; k++)
-              display[i][j + k] = center[num][k];
-
-        }
-
-        if(ctoi(display[i][j + 1]) == 3){
-
-          num = ctoi(display[i][j + 2]);
-
-          for(k = 0; k < 75, center[10 + num][k] != '\n'; k++)
-              display[i][j + k] = center[10 + num][k];
-
-        }
-      }
-    }
-  }
-
-  for(i = 0; i < 25; i++)
-    printf("%s", display[i]);
+  strcpy(part.message, "うまくにげることができた！                                                 ");
+  ToDisplay(2);
+  getch();
 
   return 0;
 
@@ -406,6 +282,75 @@ int RandomPokimon(void){
   srand((unsigned) time(NULL));
 
   return rand() % id;
+
+}
+
+int ToDisplay(int mode){
+
+  int i, j, k, num;
+
+  for(i = 0; i < 25; i++)
+    strcpy(display[i], ui[i]);
+
+  for(i = 0; i < 25; i++){
+
+    for(j = 0; j < 99; j++){
+
+      if(display[i][j] == '%'){
+
+        num = ctoi(display[i][j + 2]);
+
+        switch(ctoi(display[i][j + 1])){
+
+          case 0:
+
+            for(k = 0; k < 17; k++)
+              display[i][j + k] = part.menu[num][k];
+
+            break;
+
+          case 1:
+
+            for(k = 0; k < 75; k++)
+              display[i][j + k] = part.message[k];
+
+            break;
+
+          case 2:
+
+            for(k = 0; k < 75, part.center[num][k] != '\n'; k++)
+              display[i][j + k] = part.center[num][k];
+
+            break;
+
+          case 3:
+
+            for(k = 0; k < 75, part.center[10 + num][k] != '\n'; k++)
+              display[i][j + k] = part.center[10 + num][k];
+
+            break;
+
+        }
+      }
+    }
+  }
+
+  for(i = 0; i < 7; i++){
+
+    if(i == mode)
+      display[2 + i * 3][2] = '>';
+
+    else
+      display[2 + i * 3][2] = ' ';
+
+  }
+
+  system("cls");
+
+  for(i = 0; i < 25; i++)
+    printf("%s", display[i]);
+
+  return 0;
 
 }
 

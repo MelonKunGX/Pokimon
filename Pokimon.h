@@ -1,3 +1,6 @@
+#ifndef Pokimon_h
+#define Pokimon_h
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -81,3 +84,5 @@ int LoadPokimons(void){
   return 0;
 
 }
+
+#endif

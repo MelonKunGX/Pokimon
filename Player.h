@@ -1,6 +1,9 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#ifndef Player_h
+#define Player_h
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 static int IsLoaded = 0;
 
@@ -39,7 +42,7 @@ int GetPlayerX(void);
 int GetPlayerY(void);
 char *GetPlayerInMap(void);
 int GetPokimonId(int);
-char GetPokimonName(int);
+char *GetPokimonName(int);
 int GetPokimonAtk(int);
 int GetPokimonDef(int);
 int GetPokimonMaxHp(int);
@@ -187,13 +190,13 @@ int GetPokimonId(int index){
 
 }
 
-char GetPokimonName(int index){
+char *GetPokimonName(int index){
 
   if(IsLoaded)
     if(index >= 0 && index <= 5)
-      return *player.pokimon[index].name;
+      return player.pokimon[index].name;
 
-  return -1;
+  return "-1";
 
 }
 
@@ -359,7 +362,6 @@ int SavePlayerData(int mode){
     player.item[0].count, player.item[1].count
   );
   fclose(fp);
-  printf("%ld\n", sizeof(player));
   return 0;
 
 }
@@ -556,3 +558,5 @@ int SetPokimonSp(int index, int value){
   return -1;
 
 }
+
+#endif

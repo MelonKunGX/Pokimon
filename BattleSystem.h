@@ -1,77 +1,91 @@
+#ifndef BattleStstem_h
+#define BattleStstem_h
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <windows.h>
 #include <conio.h>
+#include "Player.h"
 
 //エンカウントするまでの基準歩数
 #define STEPS 10
 
 /* プロトタイプ宣言 */
-int Encount(void);
+int BattleEscape(void);
 int BattleFadeOut(int);
 int BattleFadeIn(void);
 int BattleInit(void);
+int BattleItemSelect(void);
 int BattleTop(int, char*);
-int BattleEscape(void);
-int ToDisplay(int);
 int ctoi(char);
+int Encount(void);
+int ToDisplay(int);
 /* プロトタイプ宣言 */
 
 char ui[25][101], display[25][101];
 struct parts{
 
   char menu[7][17];
-  char message[75];
+  char message[76];
   char center[17][76];
 
 }part;
 
-int Encount(void){
+int BattleAttack(void){
 
-  int prob;
-  FILE *fp;
+  int i, in, count = 0, mode = 0;
+  char name[20];
 
-  srand((unsigned) time(NULL));
-  // 確率 = 0～99の乱数生成 ÷ (基準歩数 + エンカウントレベル)
-  prob = (rand() % 100) / STEPS;
-  prob = 0;
+  for(i = 0; i < 6; i++){
 
-  if(prob == 0)
-    return 1;
+    printf("%d\n", GetPokimonId(i));
+    getch();
 
-  else
-    return 0;
+    if(GetPokimonId(i) != -1){
+
+      sprintf(part.menu[i], " %16s", GetPokimonName(i));
+      count++;
+
+    }else{
+
+      strcpy(part.menu[i], "                 ");
+
+    }
+  }
+
+  strcpy(part.message, "どのポキモンでこうげきする？                                               ");
+
+  while(1){
+
+    ToDisplay(mode);
+
+    in = getch();
+
+    if(in == 27)
+      break;
+
+    if(in != 0)
+      continue;
+
+    in = getch();
+
+    if(in == 72 && mode > 0)
+      mode--;
+
+    if(in == 80 && mode < count)
+      mode++;
+
+  }
+
+  return 0;
 
 }
 
-int BattleFadeIn(void){
+int BattleEscape(void){
 
-  int i, j;
-  char effect[25][101];
-
-  for(i = 0; i < 25; i++)
-    strcpy(effect[i], ui[i]);
-
-  for(i = 0; i < 25; i++)
-    for(j = 0; j < 99; j++)
-      display[i][j] = ' ';
-
-  for(i = 0; i < 13; i++){
-
-    strcpy(display[12 - i], effect[12 - i]);
-
-    if(i != 13)
-    	strcpy(display[13 + i], effect[13 + i]);
-
-    system("cls");
-
-    for(j = 0; j < 25; j++)
-      printf("%s", display[j]);
-
-    Sleep(10);
-
-  }
+  strcpy(part.message, "うまくにげきれた！                                                         ");
+  ToDisplay(2);
 
   return 0;
 
@@ -121,6 +135,38 @@ int BattleFadeOut(int mode){
 
 }
 
+int BattleFadeIn(void){
+
+  int i, j;
+  char effect[25][101];
+
+  for(i = 0; i < 25; i++)
+    strcpy(effect[i], ui[i]);
+
+  for(i = 0; i < 25; i++)
+    for(j = 0; j < 99; j++)
+      display[i][j] = ' ';
+
+  for(i = 0; i < 13; i++){
+
+    strcpy(display[12 - i], effect[12 - i]);
+
+    if(i != 13)
+    	strcpy(display[13 + i], effect[13 + i]);
+
+    system("cls");
+
+    for(j = 0; j < 25; j++)
+      printf("%s", display[j]);
+
+    Sleep(10);
+
+  }
+
+  return 0;
+
+}
+
 int BattleInit(void){
 
   int i;
@@ -137,21 +183,50 @@ int BattleInit(void){
 
 }
 
+int BattleItemSelect(void){
+
+  int in, mode = 0;
+  char menu[17];
+
+  strcpy(part.menu[0], " きずぐすり      ");
+  strcpy(part.menu[1], " ポキモンボール  ");
+  strcpy(part.menu[2], "                 ");
+
+  while(1){
+
+    ToDisplay(mode);
+
+    in = getch();
+
+    if(in == 27)
+      break;
+
+    if(in != 0)
+      continue;
+
+    in = getch();
+
+    if(in == 72)
+      if(mode == 1)
+        mode  = 0;
+
+    if(in == 80)
+      if(mode == 0)
+        mode = 1;
+
+  }
+
+  return 0;
+
+}
+
 int BattleTop(int id, char *name){
 
   int i, in, update = 1, mode = 0;
   char file_name[20];
   FILE *fp;
 
-  strcpy(part.menu[0], " たたかう        ");
-  strcpy(part.menu[1], " もちもの        ");
-  strcpy(part.menu[2], " にげる          ");
-
-  for(i = 3; i < 7; i++)
-    strcpy(part.menu[i], "                 ");
-
   sprintf(file_name, "AA/%d.txt", id);
-  sprintf(part.message, "やせいの%20sがとびだしてきた！                             ", name);
 
   if((fp = fopen(file_name, "r")) == NULL)
     return -1;
@@ -162,6 +237,15 @@ int BattleTop(int id, char *name){
   fclose(fp);
 
   while(1){
+
+    strcpy(part.menu[0], " たたかう        ");
+    strcpy(part.menu[1], " もちもの        ");
+    strcpy(part.menu[2], " にげる          ");
+
+    for(i = 3; i < 7; i++)
+      strcpy(part.menu[i], "                 ");
+
+    sprintf(part.message, "やせいの%20sがとびだしてきた！                             ", name);
 
     if(update == 1){
 
@@ -174,9 +258,20 @@ int BattleTop(int id, char *name){
 
     if(in == 13){
 
+      if(mode == 0){
+
+        BattleAttack();
+        update = 1;
+        continue;
+
+      }
+
       if(mode == 1){
 
-        //strcpy()
+        BattleItemSelect();
+        update = 1;
+        continue;
+
       }
 
       if(mode == 2){
@@ -211,49 +306,62 @@ int BattleTop(int id, char *name){
 
 }
 
-int BattleEscape(void){
+int ctoi(char c){
 
-  strcpy(part.message, "うまくにげることができた！                                                 ");
-  ToDisplay(2);
-  getch();
+  switch(c){
 
-  return 0;
+    case '0':
+      return 0;
 
+    case '1':
+      return 1;
+
+    case '2':
+      return 2;
+
+    case '3':
+      return 3;
+
+    case '4':
+      return 4;
+
+    case '5':
+      return 5;
+
+    case '6':
+      return 6;
+
+    case '7':
+      return 7;
+
+    case '8':
+      return 8;
+
+    case '9':
+      return 9;
+
+    default:
+      return -1;
+
+  }
 }
 
-int BattleItemSelect(void){
+int Encount(void){
 
-  int i, j, k, num, update;
+  int prob;
+  FILE *fp;
 
-  for(i = 0; i < 25; i++)
-    strcpy(display[i], ui[i]);
+  srand((unsigned) time(NULL));
+  // 確率 = 0～99の乱数生成 ÷ (基準歩数 + エンカウントレベル)
+  prob = (rand() % 100) / STEPS;
+  prob = 0;
 
-  while(1){
+  if(prob == 0)
+    return 1;
 
-    if(update){
+  else
+    return 0;
 
-      for(i = 0; i < 25; i++){
-
-        for(j = 0; j < 101; j++){
-
-          if(display[i][j] == '%'){
-
-            num = ctoi(display[i][j + 2]);
-
-            switch(ctoi(display[i][j + 1])){
-
-              case 0:
-
-                for(k = 0; k < 17; k++)
-                  display[i][j + k] = part.menu[num][k];
-
-                break;
-            }
-          }
-        }
-      }
-    }
-  }
 }
 
 int RandomPokimon(void){
@@ -354,42 +462,4 @@ int ToDisplay(int mode){
 
 }
 
-int ctoi(char c){
-
-  switch(c){
-
-    case '0':
-      return 0;
-
-    case '1':
-      return 1;
-
-    case '2':
-      return 2;
-
-    case '3':
-      return 3;
-
-    case '4':
-      return 4;
-
-    case '5':
-      return 5;
-
-    case '6':
-      return 6;
-
-    case '7':
-      return 7;
-
-    case '8':
-      return 8;
-
-    case '9':
-      return 9;
-
-    default:
-      return -1;
-
-  }
-}
+#endif

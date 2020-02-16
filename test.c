@@ -5,10 +5,17 @@ void main(void){
 
 	char name[20];
 
-	printf("名前=>");
-	scanf("%s", name);
+	LoadPokimons();
 
+	printf("プレイヤー=>");
+	scanf("%s", name);
 	CreatePlayerData(name);
+
+	printf("ポキモン=>");
+	scanf("%s", name);
+	AddPokimon(0, name);
+
+	SavePlayerData(1);
 	PrintPlayerData();
 
 }

@@ -225,11 +225,10 @@ int PlayerMove(int changeX, int changeY){
 
       if(Encount() == 1){
 
-        id = RandomPokimon();
-
+        RandomPokimon();
         BattleFadeOut(0);
         BattleFadeIn();
-        BattleTop(id, GetDefaultPokimonName(id));
+        BattleTop();
         BattleFadeOut(1);
         MapFadeIn(GetPlayerInMap());
 

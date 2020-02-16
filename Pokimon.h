@@ -19,7 +19,7 @@ struct status{
   int hp;
   int sp;
 
-}pokimon[PokimonCount];
+}defpokimon[PokimonCount];
 
 int Pokimon_IsLoaded = 0;
 
@@ -59,7 +59,7 @@ int CreatePokimon(int id, char *name, int type, int atk, int def, int hp, int sp
 
 char *GetDefaultPokimonName(int id){
 
-  return pokimon[id].name;
+  return defpokimon[id].name;
 
 }
 
@@ -75,7 +75,7 @@ int LoadPokimons(void){
 
     fseek(fp, i * 52L, SEEK_SET);
     fscanf(fp, "%5d%20s%5d%5d%5d%5d%5d",
-      &pokimon[i].id, pokimon[i].name, &pokimon[i].type, &pokimon[i].atk, &pokimon[i].def, &pokimon[i].hp, &pokimon[i].sp
+      &defpokimon[i].id, defpokimon[i].name, &defpokimon[i].type, &defpokimon[i].atk, &defpokimon[i].def, &defpokimon[i].hp, &defpokimon[i].sp
     );
 
   }

@@ -12,12 +12,14 @@
 #define STEPS 10
 
 /* ƒvƒƒgƒ^ƒCƒvéŒ¾ */
+int BattleAttack(int);
 int BattleEscape(void);
 int BattleFadeOut(int);
 int BattleFadeIn(void);
 int BattleInit(void);
 int BattleItemSelect(void);
-int BattleTop(int, char*);
+int BattleTop(void);
+int BattlePokimonSelect(void);
 int ctoi(char);
 int Encount(void);
 int ToDisplay(int);
@@ -32,50 +34,166 @@ struct parts{
 
 }part;
 
-int BattleAttack(void){
+struct enemy{
 
-  int i, in, count = 0, mode = 0;
+  int id;
   char name[20];
+  int type;
+  int atk;
+  int def;
+  int max_hp;
+  int hp;
+  int sp;
 
-  for(i = 0; i < 6; i++){
+}status;
 
-    printf("%d\n", GetPokimonId(i));
-    getch();
+int BattleAttack(int my_id){
 
-    if(GetPokimonId(i) != -1){
+  int i, turn, damage;
+  float com;
 
-      sprintf(part.menu[i], " %16s", GetPokimonName(i));
-      count++;
+  if(player.pokimon[my_id].sp > status.sp){
 
-    }else{
+    turn = 0;
 
-      strcpy(part.menu[i], "                 ");
+  }else if(player.pokimon[my_id].sp < status.sp){
 
-    }
+    turn = 1;
+
+  }else{
+
+    srand((unsigned) time(NULL));
+    turn = rand() % 2;
+
   }
 
-  strcpy(part.message, "‚Ç‚Ìƒ|ƒLƒ‚ƒ“‚Å‚±‚¤‚°‚«‚·‚éH                                               ");
+  for(i = 0; i < 2; i++){
 
-  while(1){
+    if(turn == 0){
 
-    ToDisplay(mode);
+      sprintf(part.message, "%20s‚Ì‚±‚¤‚°‚«I yEnterz                                 ", player.pokimon[my_id].name);
+      ToDisplay(-1);
+      printf("\n\t\t\ty%sz%d/%d\t\t\ty%sz%d/%d", player.pokimon[my_id].name, player.pokimon[my_id].hp, player.pokimon[my_id].max_hp, status.name, status.hp, status.max_hp);
 
-    in = getch();
+      while(getch() != 13);
 
-    if(in == 27)
-      break;
+      damage = (player.pokimon[my_id].atk / status.def) * 10;
 
-    if(in != 0)
+      if(defpokimon[player.pokimon[my_id].id].type == 0){
+
+        if(status.type == 1)
+          damage /= 2;
+
+        if(status.type == 2)
+          damage *= 2;
+
+      }
+
+      if(defpokimon[player.pokimon[my_id].id].type == 1){
+
+        if(status.type == 0)
+          damage *= 2;
+
+        if(status.type == 2)
+          damage /= 2;
+
+      }
+
+      if(defpokimon[player.pokimon[my_id].id].type == 2){
+
+        if(status.type == 0)
+          damage /= 2;
+
+        if(status.type == 1)
+          damage *= 2;
+
+      }
+
+      if(damage < 1)
+        damage += 1;
+
+      status.hp -= damage;
+
+      if(status.hp <= 0){
+
+        status.hp = 0;
+        sprintf(part.message, "%20s‚ğ‚½‚¨‚µ‚½I yEnterz                                 ", status.name);
+        ToDisplay(-1);
+        printf("\n\t\t\ty%sz%d/%d\t\t\ty%sz%d/%d", player.pokimon[my_id].name, player.pokimon[my_id].hp, player.pokimon[my_id].max_hp, status.name, status.hp, status.max_hp);
+
+        while(getch() != 13);
+
+        return 1;
+
+      }
+
+      turn = 1;
       continue;
 
-    in = getch();
+    }
 
-    if(in == 72 && mode > 0)
-      mode--;
+    if(turn == 1){
 
-    if(in == 80 && mode < count)
-      mode++;
+      sprintf(part.message, "%20s‚Ì‚±‚¤‚°‚«I yEnterz                                 ", status.name);
+      ToDisplay(-1);
+      printf("\n\t\t\ty%sz%d/%d\t\t\ty%sz%d/%d", player.pokimon[my_id].name, player.pokimon[my_id].hp, player.pokimon[my_id].max_hp, status.name, status.hp, status.max_hp);
 
+      while(getch() != 13);
+
+      damage = (status.atk / player.pokimon[my_id].def) * 10;
+
+      if(status.type == 0){
+
+        if(defpokimon[player.pokimon[my_id].id].type == 1)
+          damage /= 2;
+
+        if(defpokimon[player.pokimon[my_id].id].type == 2)
+          damage *= 2;
+
+      }
+
+      if(status.type == 1){
+
+        if(defpokimon[player.pokimon[my_id].id].type == 0)
+          damage *= 2;
+
+        if(defpokimon[player.pokimon[my_id].id].type == 2)
+          damage /= 2;
+
+      }
+
+      if(status.type == 2){
+
+        if(defpokimon[player.pokimon[my_id].id].type == 0)
+          damage /= 2;
+
+        if(defpokimon[player.pokimon[my_id].id].type == 1)
+          damage *= 2;
+
+      }
+
+      if(damage < 1)
+        damage += 1;
+
+      player.pokimon[my_id].hp -= damage;
+
+      if(player.pokimon[my_id].hp <= 0){
+
+        player.pokimon[my_id].hp = 0;
+        sprintf(part.message, "%20s‚Í—Ís‚«‚Ä‚µ‚Ü‚Á‚½I yEnterz                         ", player.pokimon[my_id].name);
+        ToDisplay(-1);
+        printf("\n\t\t\ty%sz%d/%d\t\t\ty%sz%d/%d", player.pokimon[my_id].name, player.pokimon[my_id].hp, player.pokimon[my_id].max_hp, status.name, status.hp, status.max_hp);
+
+        while(getch() != 13);
+
+        return 1;
+
+      }
+
+      turn = 0;
+      continue;
+
+    }
   }
 
   return 0;
@@ -194,6 +312,12 @@ int BattleItemSelect(void){
 
   while(1){
 
+    if(mode == 0)
+      sprintf(part.message, "g—p‚µ‚Ä‚¢‚éƒ|ƒLƒ‚ƒ“‚ÌHP‚ğ30‰ñ•œ‚·‚éB Š”: %d                           ", GetItemCount(0));
+
+    if(mode == 1)
+      sprintf(part.message, "–ì¶ƒ|ƒLƒ‚ƒ“‚ğ•ß‚Ü‚¦‚éB Š”: %d                                         ", GetItemCount(1));
+
     ToDisplay(mode);
 
     in = getch();
@@ -220,13 +344,13 @@ int BattleItemSelect(void){
 
 }
 
-int BattleTop(int id, char *name){
+int BattleTop(void){
 
-  int i, in, update = 1, mode = 0;
+  int i, in, my_id, update = 1, mode = 0;
   char file_name[20];
   FILE *fp;
 
-  sprintf(file_name, "AA/%d.txt", id);
+  sprintf(file_name, "AA/%d.txt", status.id);
 
   if((fp = fopen(file_name, "r")) == NULL)
     return -1;
@@ -235,6 +359,18 @@ int BattleTop(int id, char *name){
     fgets(part.center[i], 80, fp);
 
   fclose(fp);
+
+  for(i = 0; i < 7; i++)
+    strcpy(part.menu[i], "                 ");
+
+  sprintf(part.message, "‚â‚¹‚¢‚Ì%20s‚ª‚Æ‚Ñ‚¾‚µ‚Ä‚«‚½I yEnterz                   ", status.name);
+  ToDisplay(-1);
+  while(getch() != 13);
+
+  my_id = BattlePokimonSelect();
+
+  if(my_id == -1)
+    return 0;
 
   while(1){
 
@@ -245,11 +381,12 @@ int BattleTop(int id, char *name){
     for(i = 3; i < 7; i++)
       strcpy(part.menu[i], "                 ");
 
-    sprintf(part.message, "‚â‚¹‚¢‚Ì%20s‚ª‚Æ‚Ñ‚¾‚µ‚Ä‚«‚½I                             ", name);
+    strcpy(part.message, "‚Ç‚¤‚·‚éH                                                                 ");
 
     if(update == 1){
 
       ToDisplay(mode);
+      printf("\n\t\t\ty%sz%d/%d\t\t\ty%sz%d/%d", player.pokimon[my_id].name, player.pokimon[my_id].hp, player.pokimon[my_id].max_hp, status.name, status.hp, status.max_hp);
       update = 0;
 
     }
@@ -260,9 +397,11 @@ int BattleTop(int id, char *name){
 
       if(mode == 0){
 
-        BattleAttack();
-        update = 1;
-        continue;
+        if(BattleAttack(my_id) == 0)
+          update = 1;
+
+        else
+          break;
 
       }
 
@@ -270,7 +409,6 @@ int BattleTop(int id, char *name){
 
         BattleItemSelect();
         update = 1;
-        continue;
 
       }
 
@@ -304,6 +442,73 @@ int BattleTop(int id, char *name){
 
   return 0;
 
+}
+
+int BattlePokimonSelect(void){
+
+  int i, in, count = -1, mode = 0, find = 0;
+  char name[20];
+
+  for(i = 0; i < 6, strcmp(player.pokimon[i].name, "null") != 0, player.pokimon[i].hp != 0; i++)
+    find = 1;
+
+  if(!find){
+
+    sprintf(part.message, "%20s‚Íí‚¦‚éƒ|ƒLƒ‚ƒ“‚ğ‚Á‚Ä‚¢‚È‚¢... yEnterz            ", player.name);
+    ToDisplay(-1);
+    while(getch() != 13);
+    return -1;
+
+  }
+
+  for(i = 0; i < 6; i++){
+
+    if(strcmp(GetPokimonName(i), "null") != 0){
+
+      sprintf(part.menu[i], " %16s", GetPokimonName(i));
+      count++;
+
+    }else{
+
+      strcpy(part.menu[i], "                 ");
+
+    }
+  }
+
+  while(1){
+
+    strcpy(part.message, "‚Ç‚Ìƒ|ƒLƒ‚ƒ“‚Å‚±‚¤‚°‚«‚·‚éH                                               ");
+    ToDisplay(mode);
+
+    in = getch();
+
+    if(in == 13){
+
+      if(player.pokimon[mode].hp == 0){
+
+        strcpy(part.message, "‚»‚Ìƒ|ƒLƒ‚ƒ“‚Í‚·‚Å‚É—Ís‚«‚Ä‚¢‚é... yEnterz                              ");
+        ToDisplay(mode);
+        while(getch() != 13);
+        continue;
+
+      }
+
+      return mode;
+
+    }
+
+    if(in != 0)
+      continue;
+
+    in = getch();
+
+    if(in == 72 && mode > 0)
+      mode--;
+
+    if(in == 80 && mode < count)
+      mode++;
+
+  }
 }
 
 int ctoi(char c){
@@ -389,7 +594,18 @@ int RandomPokimon(void){
 
   srand((unsigned) time(NULL));
 
-  return rand() % id;
+  id = rand() % id;
+
+  status.id = id;
+  strcpy(status.name, defpokimon[id].name);
+  status.type = defpokimon[id].type;
+  status.atk = defpokimon[id].atk;
+  status.def = defpokimon[id].def;
+  status.max_hp = defpokimon[id].hp;
+  status.hp = defpokimon[id].hp;
+  status.sp = defpokimon[id].sp;
+
+  return 0;
 
 }
 

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "Pokimon.h"
 
 static int IsLoaded = 0;
 
@@ -65,6 +66,27 @@ int SetPokimonMaxHp(int, int);
 int SetPokimonHp(int, int);
 int SetPokimonSp(int, int);
 /* プロトタイプ宣言 */
+
+int AddPokimon(int id, char *name){
+
+  int i;
+
+  if(id > PokimonCount)
+    return -1;
+
+  for(i = 0; i < 6, strcmp(player.pokimon[i].name, "null") != 0; i++);
+
+  player.pokimon[i].id = id;
+  strcpy(player.pokimon[i].name, name);
+  player.pokimon[i].atk = defpokimon[id].atk;
+  player.pokimon[i].def = defpokimon[id].def;
+  player.pokimon[i].max_hp = defpokimon[id].hp;
+  player.pokimon[i].hp = defpokimon[id].hp;
+  player.pokimon[i].sp = defpokimon[id].sp;
+
+  return 0;
+
+}
 
 int CreatePlayerData(char *name){
 

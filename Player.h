@@ -34,7 +34,8 @@ static struct players{
   struct items item[2];
 }player;
 
-/* ƒvƒƒgƒ^ƒCƒvéŒ¾ */
+/* ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€ */
+int AddPokimon(int, char*);
 int CreatePlayerData(char*);
 int GetItemCount(int);
 int GetPlayerId(void);
@@ -65,7 +66,7 @@ int SetPokimonDef(int, int);
 int SetPokimonMaxHp(int, int);
 int SetPokimonHp(int, int);
 int SetPokimonSp(int, int);
-/* ƒvƒƒgƒ^ƒCƒvéŒ¾ */
+/* ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€ */
 
 int AddPokimon(int id, char *name){
 
@@ -132,10 +133,10 @@ int CreatePlayerData(char *name){
   }
 
   player.item[0].id = 0;
-  strcpy(player.item[0].name, "‚«‚¸‚®‚·‚è");
+  strcpy(player.item[0].name, "ããšãã™ã‚Š");
   player.item[0].count = 0;
   player.item[1].id = 1;
-  strcpy(player.item[1].name, "ƒ|ƒLƒ‚ƒ“ƒ{[ƒ‹");
+  strcpy(player.item[1].name, "ãƒã‚­ãƒ¢ãƒ³ãƒœãƒ¼ãƒ«");
   player.item[1].count = 0;
 
   IsLoaded = 1;
@@ -293,9 +294,9 @@ int LoadPlayerData(int id){
   ) != EOF){
 
     player.item[0].id = 0;
-    strcpy(player.item[0].name, "‚«‚¸‚®‚·‚è");
+    strcpy(player.item[0].name, "ããšãã™ã‚Š");
     player.item[1].id = 1;
-    strcpy(player.item[1].name, "ƒ|ƒLƒ‚ƒ“ƒ{[ƒ‹");
+    strcpy(player.item[1].name, "ãƒã‚­ãƒ¢ãƒ³ãƒœãƒ¼ãƒ«");
 
     IsLoaded = 1;
     fclose(fp);
@@ -316,30 +317,30 @@ int PrintPlayerData(void){
     return -1;
 
   printf("ID: %d\n", player.id);
-  printf("–¼‘O: %s\n", player.name);
-  printf("XÀ•W: %d\n", player.x);
-  printf("YÀ•W: %d\n", player.y);
-  printf("ƒ}ƒbƒv: %s\n", player.map);
+  printf("åå‰: %s\n", player.name);
+  printf("Xåº§æ¨™: %d\n", player.x);
+  printf("Yåº§æ¨™: %d\n", player.y);
+  printf("ãƒãƒƒãƒ—: %s\n", player.map);
 
   for(i = 0; i < 6; i ++){
 
-    printf("ƒ|ƒLƒ‚ƒ“%d:\n", i + 1);
+    printf("ãƒã‚­ãƒ¢ãƒ³%d:\n", i + 1);
     printf("\tID: %d\n", player.pokimon[i].id);
-    printf("\t–¼‘O: %s\n", player.pokimon[i].name);
-    printf("\tUŒ‚—Í: %d\n", player.pokimon[i].atk);
-    printf("\t–hŒä—Í: %d\n", player.pokimon[i].def);
-    printf("\tÅ‘å‘Ì—Í: %d\n", player.pokimon[i].max_hp);
-    printf("\t‘Ì—Í: %d\n", player.pokimon[i].hp);
-    printf("\t‚·‚Î‚â‚³: %d\n", player.pokimon[i].sp);
+    printf("\tåå‰: %s\n", player.pokimon[i].name);
+    printf("\tæ”»æ’ƒåŠ›: %d\n", player.pokimon[i].atk);
+    printf("\té˜²å¾¡åŠ›: %d\n", player.pokimon[i].def);
+    printf("\tæœ€å¤§ä½“åŠ›: %d\n", player.pokimon[i].max_hp);
+    printf("\tä½“åŠ›: %d\n", player.pokimon[i].hp);
+    printf("\tã™ã°ã‚„ã•: %d\n", player.pokimon[i].sp);
 
   }
 
   for(i = 0; i < 2; i++){
 
-    printf("ƒAƒCƒeƒ€%d:\n", i + 1);
+    printf("ã‚¢ã‚¤ãƒ†ãƒ %d:\n", i + 1);
     printf("\tID: %d\n", player.item[i].id);
-    printf("\t–¼‘O: %s\n", player.item[i].name);
-    printf("\tŒÂ”: %d\n", player.item[i].count);
+    printf("\tåå‰: %s\n", player.item[i].name);
+    printf("\tå€‹æ•°: %d\n", player.item[i].count);
 
   }
 

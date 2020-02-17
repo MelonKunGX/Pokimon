@@ -5,33 +5,34 @@
 #include "Player.h"
 #include "BattleSystem.h"
 #include "Pokimon.h"
+#include "gamemenu.h"
 
 char map[25][101];
 
+int ToMap(void);
 int Key(void);
 int PlayerMove(int, int);
 int MapFadeIn(char*);
 int MapFadeOut(void);
 
-int main(void){
+int ToMap(void){
 
   int i, j, chr, result;
   char before[1] = {' '}, file_name[20];
   FILE *fp;
 
 	system("mode 100,30");
-  LoadPlayerData(0);
+
+	if(!IsLoaded){
+
+		printf("【エラー: プレイヤーデータが読み込めませんでした。】\n");
+    return -1;
+
+	}
 
   if(BattleInit() == -1){
 
     printf("【エラー: BattleUIが読み込めませんでした。】\n");
-    return -1;
-
-  }
-
-  if(LoadPokimons() == -1){
-
-    printf("【エラー: ポキモンが読み込めませんでした。】\n");
     return -1;
 
   }
@@ -102,7 +103,6 @@ int main(void){
 
   }
 
-  SavePlayerData(1);
   system("cls");
   return 0;
 
@@ -111,11 +111,32 @@ int main(void){
 int Key(void){
 
   int in, result;
+  char command[255];
 
   in = getch();
 
-  if(in == 27)
-    return 1;
+  if(in == 27){
+
+    if(menu() == 1)
+      return 1;
+
+    return 0;
+
+  }
+
+  if(in == 47){
+
+    printf(">");
+    scanf("%s", command);
+
+    if(strcmp(command, "encount") == 0){
+
+      printf(">");
+      scanf("%d", &enc);
+      return 0;
+
+    }
+  }
 
   if(in != 0)
     return 2;

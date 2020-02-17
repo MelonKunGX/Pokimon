@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define PokimonCount 3
+#define PokimonCount 8
 
 char *GetDefaultPokimonName(int);
 

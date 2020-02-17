@@ -8,9 +8,6 @@
 #include <conio.h>
 #include "Player.h"
 
-//エンカウントするまでの基準歩数
-#define STEPS 10
-
 /* プロトタイプ宣言 */
 int BattleAttack(int);
 int BattleEscape(void);
@@ -25,6 +22,7 @@ int Encount(void);
 int ToDisplay(int);
 /* プロトタイプ宣言 */
 
+int enc = 10;
 char ui[25][101], display[25][101];
 struct parts{
 
@@ -557,9 +555,12 @@ int Encount(void){
   FILE *fp;
 
   srand((unsigned) time(NULL));
-  // 確率 = 0～99の乱数生成 ÷ (基準歩数 + エンカウントレベル)
-  prob = (rand() % 100) / STEPS;
-  prob = 0;
+
+  if(enc == 0)
+    return 0;
+
+  // 確率 = 0～99の乱数生成 ÷ 基準歩数
+  prob = (rand() % 100) / enc;
 
   if(prob == 0)
     return 1;
@@ -577,24 +578,22 @@ int RandomPokimon(void){
   if((fp = fopen("Data/Pokimons.txt", "r")) == NULL)
     return -1;
 
-  while(1){
+   do{
 
-  	c = fgetc(fp);
+   	c = fgetc(fp);
 
-  	if(c == EOF)
-  		break;
+   	if(c == '\n')
+   		id++;
 
-  	if(c == '\n')
-  		id++;
-
-  }
+   }while(c != EOF);
 
   if(id == 0)
     return -1;
 
-  srand((unsigned) time(NULL));
+	srand((unsigned) time(NULL));
+  id = rand() % (id - 3);
 
-  id = rand() % id;
+  id += 3;
 
   status.id = id;
   strcpy(status.name, defpokimon[id].name);

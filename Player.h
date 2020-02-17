@@ -35,6 +35,7 @@ static struct players{
 }player;
 
 /* プロトタイプ宣言 */
+int AddPokimon(int, char*);
 int CreatePlayerData(char*);
 int GetItemCount(int);
 int GetPlayerId(void);
@@ -71,7 +72,7 @@ int AddPokimon(int id, char *name){
 
   int i;
 
-  if(id > PokimonCount)
+  if(id > PokimonCount || id < 0)
     return -1;
 
   for(i = 0; i < 6, strcmp(player.pokimon[i].name, "null") != 0; i++);
